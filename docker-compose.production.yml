@@ -1,0 +1,22 @@
+# ============================================================
+# Clínica Sorriso e Vida — compose PRODUÇÃO (servidor com Nginx Proxy Manager)
+# Anexa o nginx à rede externa proxy_network e remove a
+# publicação direta da porta (a 8000 já está ocupada por outro
+# projeto no servidor, e o NPM roteia pelo nome do container).
+# Uso: docker compose -f docker-compose.yml -f docker-compose.local.yml -f docker-compose.production.yml up -d --build
+# ============================================================
+services:
+  nginx:
+    container_name: clinica-sorriso-e-vida-nginx
+    ports: !reset []
+    networks:
+      - clinica-sorriso-e-vida
+      - proxy_network
+
+  # Postgres não precisa ficar acessível fora da rede docker do projeto.
+  postgres:
+    ports: !reset []
+
+networks:
+  proxy_network:
+    external: true

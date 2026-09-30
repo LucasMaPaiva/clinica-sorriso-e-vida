@@ -1,0 +1,82 @@
+# ============================================================
+# Clínica Sorriso e Vida — compose BASE (local e servidor)
+# Local:    make up  → carrega também o docker-compose.local.yml
+#           (postgres + evolution)
+# Servidor: sobe só este arquivo; DB_HOST no .env aponta para o
+#           banco do servidor
+# ============================================================
+name: clinica-sorriso-e-vida
+
+x-app-base: &app-base
+  build:
+    context: .
+    dockerfile: .docker/php/Dockerfile
+    target: ${APP_BUILD_TARGET:-dev}
+    args:
+      UID: "${DOCKER_UID:-1000}"
+      GID: "${DOCKER_GID:-1000}"
+  restart: unless-stopped
+  volumes:
+    - ./:/var/www/html
+  depends_on:
+    redis:
+      condition: service_healthy
+  networks:
+    - clinica-sorriso-e-vida
+
+services:
+  app:
+    <<: *app-base
+
+  queue:
+    <<: *app-base
+    command: php artisan queue:work redis --sleep=1 --tries=3 --backoff=5 --max-time=3600
+
+  scheduler:
+    <<: *app-base
+    command: php artisan schedule:work
+
+  nginx:
+    image: nginx:1.29-alpine
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8000}:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./.docker/nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - app
+    networks:
+      - clinica-sorriso-e-vida
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./.docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - clinica-sorriso-e-vida
+
+  # Ferramenta sob demanda (não sobe com o make up):
+  # compila os assets do front — make assets
+  assets:
+    image: node:22-alpine
+    profiles: ["tools"]
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - clinica-sorriso-e-vida
+
+volumes:
+  redis-data:
+
+networks:
+  clinica-sorriso-e-vida:

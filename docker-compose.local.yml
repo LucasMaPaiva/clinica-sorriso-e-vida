@@ -1,0 +1,62 @@
+# ============================================================
+# Clínica Sorriso e Vida — compose LOCAL (só desenvolvimento)
+# Adiciona o PostgreSQL 17 e a Evolution API ao ambiente base.
+# NUNCA usar no servidor — lá o banco é o do servidor.
+# ============================================================
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-clinica_sorriso_vida}
+      POSTGRES_USER: ${DB_USERNAME:-clinica_sorriso_vida}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "${FORWARD_DB_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./.docker/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./.docker/postgresql/initdb.d:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-clinica_sorriso_vida} -d ${DB_DATABASE:-clinica_sorriso_vida}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - clinica-sorriso-e-vida
+
+  evolution:
+    image: evoapicloud/evolution-api:v2.3.7
+    restart: unless-stopped
+    ports:
+      - "${EVOLUTION_PORT:-8080}:8080"
+    environment:
+      SERVER_URL: http://localhost:${EVOLUTION_PORT:-8080}
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-clinica-local-dev-key}
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://${DB_USERNAME:-clinica_sorriso_vida}:${DB_PASSWORD:-secret}@postgres:5432/evolution
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://redis:6379/6
+      CACHE_REDIS_PREFIX_KEY: evolution
+      # Webhook global: toda mensagem recebida bate na rota do Laravel
+      WEBHOOK_GLOBAL_ENABLED: "true"
+      WEBHOOK_GLOBAL_URL: http://nginx/api/webhooks/evolution?token=${EVOLUTION_WEBHOOK_TOKEN:-local-dev-webhook-token}
+      WEBHOOK_EVENTS_MESSAGES_UPSERT: "true"
+      WEBHOOK_EVENTS_CONNECTION_UPDATE: "true"
+      LOG_LEVEL: ERROR,WARN,INFO
+      DEL_INSTANCE: "false"
+    volumes:
+      - evolution-instances:/evolution/instances
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - clinica-sorriso-e-vida
+
+volumes:
+  postgres-data:
+  evolution-instances:
