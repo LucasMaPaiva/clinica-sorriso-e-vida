@@ -2,6 +2,13 @@
 
 Sistema independente de agendamento odontológico com painel administrativo e atendimento automatizado pelo WhatsApp.
 
+## Manual de uso
+
+- [Manual em PDF para recepção e pacientes](docs/Manual-de-Uso-Clinica-Sorriso-e-Vida.pdf)
+- [Guia em PDF para teste em dupla e Evolution](docs/Guia-de-Teste-em-Dupla.pdf)
+- [Fonte editável do manual](docs/manual/manual.html)
+- [Fonte editável do guia de teste](docs/partner-test/guide.html)
+
 ## Funcionalidades
 
 - Pacientes, dentistas e procedimentos.
@@ -17,10 +24,7 @@ Sistema independente de agendamento odontológico com painel administrativo e at
 
 ```bash
 cp .env.example .env
-make up
-make composer c="install"
-make artisan c="key:generate"
-make fresh
+make install
 ```
 
 - Painel: <http://localhost:8001/admin>
@@ -52,3 +56,32 @@ O container `queue` processa conversas e o `scheduler` dispara lembretes a cada 
 ```bash
 make test
 ```
+
+## Publicar em homologação
+
+O instalador constrói imagens imutáveis com o código, `vendor` e assets dentro
+delas. Não é necessário instalar Composer, criar `vendor` ou corrigir UID/GID no
+servidor.
+
+```bash
+cp .env.example .env
+nano .env
+make install
+```
+
+Antes de executar, configure no `.env`:
+
+- `APP_ENV=staging` (ou `production` na publicação definitiva);
+- `APP_URL` com o domínio HTTPS;
+- senhas fortes em `DB_PASSWORD` e `ADMIN_SEED_PASSWORD`;
+- `EVOLUTION_API_KEY` e `EVOLUTION_WEBHOOK_TOKEN` aleatórios;
+- `EVOLUTION_ALLOWED_NUMBERS` somente com os testadores.
+
+O comando cria a rede `proxy_network` quando necessário, gera `APP_KEY`, força
+as opções seguras de homologação, constrói as imagens, executa migrations e
+seeders, otimiza o Laravel e reinicia os workers.
+
+Para atualizações futuras, use novamente `git pull && make install`. O ambiente
+(`local`, `staging` ou `production`) e todas as portas vêm exclusivamente do
+`.env`. Não rode `composer install` manualmente no servidor: a imagem de
+homologação já contém o `vendor`.

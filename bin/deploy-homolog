@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_FILE="${PROJECT_DIR}/.env"
+
+cd "${PROJECT_DIR}"
+
+if [[ ! -f "${ENV_FILE}" ]]; then
+    cp .env.example .env
+    echo "Arquivo .env criado. Preencha domínio, senhas, chaves e EVOLUTION_ALLOWED_NUMBERS; depois execute este comando novamente."
+    exit 1
+fi
+
+env_value() {
+    local key="$1"
+
+    awk -F= -v key="${key}" '
+        $1 == key {
+            sub(/^[^=]*=/, "")
+            gsub(/^"|"$/, "")
+            print
+            exit
+        }
+    ' "${ENV_FILE}"
+}
+
+set_env_value() {
+    local key="$1"
+    local value="$2"
+    local temporary
+
+    temporary="$(mktemp)"
+    awk -v key="${key}" -v value="${value}" '
+        BEGIN { found = 0 }
+        index($0, key "=") == 1 {
+            print key "=" value
+            found = 1
+            next
+        }
+        { print }
+        END {
+            if (! found) {
+                print key "=" value
+            }
+        }
+    ' "${ENV_FILE}" > "${temporary}"
+    mv "${temporary}" "${ENV_FILE}"
+}
+
+require_secret() {
+    local key="$1"
+    local value
+
+    value="$(env_value "${key}")"
+    if [[ -z "${value}" || "${value}" == "secret" || "${value}" == "password" ]]; then
+        echo "Configure um valor forte para ${key} no .env."
+        exit 1
+    fi
+}
+
+set_env_value APP_DEBUG false
+set_env_value APP_BUILD_TARGET prod
+
+if [[ -z "$(env_value APP_KEY)" ]]; then
+    set_env_value APP_KEY "base64:$(openssl rand -base64 32 | tr -d '\n')"
+    echo "APP_KEY gerada automaticamente."
+fi
+
+require_secret DB_PASSWORD
+require_secret EVOLUTION_API_KEY
+require_secret EVOLUTION_WEBHOOK_TOKEN
+require_secret ADMIN_SEED_PASSWORD
+
+if [[ -z "$(env_value EVOLUTION_ALLOWED_NUMBERS)" ]]; then
+    echo "Configure EVOLUTION_ALLOWED_NUMBERS com os telefones autorizados na homologação."
+    exit 1
+fi
+
+if [[ "$(env_value APP_URL)" != https://* ]]; then
+    echo "Configure APP_URL com o domínio HTTPS da homologação."
+    exit 1
+fi
+
+if ! docker network inspect proxy_network >/dev/null 2>&1; then
+    docker network create proxy_network >/dev/null
+    echo "Rede proxy_network criada."
+fi
+
+COMPOSE=(
+    docker compose
+    -f docker-compose.yml
+    -f docker-compose.local.yml
+    -f docker-compose.production.yml
+)
+
+"${COMPOSE[@]}" config --quiet
+"${COMPOSE[@]}" up -d --build
+
+ready=false
+for attempt in $(seq 1 30); do
+    if "${COMPOSE[@]}" exec -T app php artisan about >/dev/null 2>&1; then
+        ready=true
+        break
+    fi
+    sleep 2
+done
+
+if [[ "${ready}" != true ]]; then
+    echo "A aplicação não iniciou. Últimos logs:"
+    "${COMPOSE[@]}" logs --tail=100 app
+    exit 1
+fi
+
+"${COMPOSE[@]}" exec -T app php artisan migrate --seed --force
+"${COMPOSE[@]}" exec -T app php artisan optimize:clear
+"${COMPOSE[@]}" exec -T app php artisan optimize
+"${COMPOSE[@]}" restart queue scheduler
+"${COMPOSE[@]}" ps
+
+echo
+echo "Homologação publicada. Configure o Proxy Host para clinica-sorriso-e-vida-nginx:80."
+echo "Evolution Manager: http://IP_DO_SERVIDOR:$(env_value EVOLUTION_PORT)/manager"

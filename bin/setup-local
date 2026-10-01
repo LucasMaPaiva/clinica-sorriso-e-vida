@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${PROJECT_DIR}"
+
+if [[ ! -f .env ]]; then
+    cp .env.example .env
+fi
+
+set_env_value() {
+    local key="$1"
+    local value="$2"
+    local temporary
+    temporary="$(mktemp)"
+    awk -v key="${key}" -v value="${value}" '
+        BEGIN { found = 0 }
+        index($0, key "=") == 1 { print key "=" value; found = 1; next }
+        { print }
+        END { if (! found) print key "=" value }
+    ' .env > "${temporary}"
+    mv "${temporary}" .env
+}
+
+command -v docker >/dev/null 2>&1 || { echo "Docker não está instalado."; exit 1; }
+docker compose version >/dev/null 2>&1 || { echo "Docker Compose v2 não está disponível."; exit 1; }
+
+set_env_value DOCKER_UID "$(id -u)"
+set_env_value DOCKER_GID "$(id -g)"
+set_env_value APP_ENV local
+set_env_value APP_BUILD_TARGET dev
+
+COMPOSE=(docker compose -f docker-compose.yml -f docker-compose.local.yml)
+
+"${COMPOSE[@]}" config --quiet
+"${COMPOSE[@]}" up -d postgres redis evolution
+"${COMPOSE[@]}" build app
+"${COMPOSE[@]}" run --rm app composer install --no-interaction --prefer-dist --optimize-autoloader
+
+if grep -q '^APP_KEY=$' .env; then
+    "${COMPOSE[@]}" run --rm app php artisan key:generate --force
+fi
+
+"${COMPOSE[@]}" run --rm app php artisan migrate --seed --force
+"${COMPOSE[@]}" run --rm assets sh -c "npm ci && npm run build"
+"${COMPOSE[@]}" up -d app queue scheduler nginx
+"${COMPOSE[@]}" ps
+
+echo
+echo "Painel: http://localhost:$(awk -F= '$1 == \"APP_PORT\" {print $2}' .env)/admin"
+echo "Evolution Manager: http://localhost:$(awk -F= '$1 == \"EVOLUTION_PORT\" {print $2}' .env)/manager"

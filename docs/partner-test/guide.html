@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Roteiro de Teste em Dupla — Clínica Sorriso e Vida</title>
+  <style>
+    :root{--ink:#17343c;--muted:#62777c;--night:#102b33;--teal:#0b9f91;--mint:#eaf8f4;--line:#d8e8e5;--orange:#f29b38;--orange-soft:#fff2df;--red:#d95043;--green:#2e9f69;--paper:#fff}
+    *{box-sizing:border-box}html,body{margin:0;padding:0;background:#dfeae8;color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif}body{counter-reset:page}@page{size:A4;margin:0}
+    .page{position:relative;width:210mm;height:297mm;margin:0 auto 8mm;padding:15mm 16mm 13mm;overflow:hidden;background:var(--paper);page-break-after:always;counter-increment:page}.page:last-child{page-break-after:auto}
+    .page::before{content:"CLÍNICA SORRISO E VIDA  •  TESTE EM DUPLA";position:absolute;left:16mm;bottom:7mm;color:#81969a;font-size:7pt;font-weight:800;letter-spacing:.08em}.page::after{content:counter(page,decimal-leading-zero);position:absolute;right:16mm;bottom:7mm;color:#81969a;font-size:8pt;font-weight:900}.cover::before,.cover::after{display:none}
+    h1,h2,h3,p{margin-top:0}h1{font-size:39pt;line-height:1.02;letter-spacing:-.045em}h2{margin-bottom:3mm;font-size:21pt;line-height:1.08;letter-spacing:-.025em}h3{margin-bottom:2mm;font-size:11.5pt}p,li,td,th{font-size:9pt;line-height:1.43}p{margin-bottom:3mm}ul,ol{margin:1.5mm 0 3mm;padding-left:5mm}li{margin-bottom:1.3mm}strong{color:var(--night)}
+    .eyebrow{margin-bottom:2.3mm;color:var(--teal);font-size:7.8pt;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.lead{max-width:165mm;color:var(--muted);font-size:10.8pt;line-height:1.5}.small{color:var(--muted);font-size:7.5pt;line-height:1.4}
+    .header{display:flex;justify-content:space-between;gap:8mm;margin-bottom:6mm}.section-no{display:grid;flex:0 0 auto;width:14mm;height:14mm;place-items:center;border-radius:50%;background:var(--orange);color:white;font-size:11pt;font-weight:900}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:5mm}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}.card{padding:4.5mm;border:1px solid var(--line);border-radius:4mm;background:#fff}.card.soft{background:var(--mint)}.card.warm{background:var(--orange-soft);border-color:#f6d7aa}.card.dark{border:0;background:var(--night);color:white}.card.dark h3,.card.dark strong{color:white}.card p:last-child,.card ul:last-child{margin-bottom:0}
+    .icon{display:grid;width:10mm;height:10mm;margin-bottom:3mm;place-items:center;border-radius:3mm;background:var(--orange-soft);color:#a75e0a;font-size:15pt;font-weight:900}.badge{display:inline-block;padding:1.1mm 2.4mm;border-radius:20mm;background:var(--mint);color:#08746b;font-size:7.3pt;font-weight:850}.badge.orange{background:var(--orange-soft);color:#955507}.badge.green{background:#e8f7ef;color:#1d764d}
+    .path{display:flex;align-items:center;gap:2mm;margin:3mm 0 5mm;padding:3mm 4mm;border-radius:3mm;background:var(--night);color:white;font-size:8.4pt;font-weight:750}.path b{color:#6ee3d5}.arrow{color:#8fa9a7}
+    .command{position:relative;margin:3mm 0;padding:4mm 5mm;border-radius:3mm;background:#081c22;color:#d8f8f3;font:8.3pt/1.55 "SFMono-Regular",Consolas,monospace;white-space:pre-wrap}.command .comment{color:#78a39e}.command strong{color:#ffbf69}
+    .tip,.warning,.success{margin:4mm 0;padding:3.5mm 4mm;border-left:1.5mm solid var(--teal);border-radius:0 3mm 3mm 0;background:var(--mint);font-size:8.5pt;line-height:1.4}.warning{border-color:var(--orange);background:var(--orange-soft)}.success{border-color:var(--green);background:#e9f8f0}.danger{border-color:var(--red);background:#fdecea}
+    .shot-wrap{position:relative;margin:4mm 0 5mm;overflow:hidden;border:1px solid #29454b;border-radius:4mm;box-shadow:0 3mm 8mm rgba(17,43,51,.1)}.shot{display:block;width:100%;height:70mm;object-fit:cover;object-position:top}.shot.tall{height:84mm}.shot.center{object-position:center}.caption{position:absolute;left:3mm;bottom:3mm;padding:1.4mm 2.5mm;border-radius:2mm;background:rgba(16,43,51,.92);color:white;font-size:7pt}
+    table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:3mm}th{padding:2.4mm 3mm;background:var(--night);color:white;text-align:left;font-size:7.7pt;letter-spacing:.03em;text-transform:uppercase}td{padding:2.2mm 3mm;border-top:1px solid var(--line);vertical-align:top;font-size:8.1pt;line-height:1.35}tr:first-child td{border-top:0}td:first-child{width:28%;color:#08766e;font-weight:800}
+    .steps{display:grid;gap:3mm}.step{display:grid;grid-template-columns:10mm 1fr;gap:3mm;align-items:start}.step>b{display:grid;width:9mm;height:9mm;place-items:center;border-radius:50%;background:var(--orange);color:white;font-size:8.5pt}.step p{margin:.5mm 0 0}
+    .roles{display:grid;grid-template-columns:1fr 1fr;gap:5mm}.role{padding:6mm;border-radius:5mm;color:white}.role.a{background:var(--teal)}.role.b{background:var(--orange)}.role h3,.role strong{color:white}.role .big{font-size:24pt;font-weight:900}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:2mm;margin:5mm 0}.flow div{position:relative;padding:4mm 2mm;border-radius:3mm;background:var(--mint);color:#08766e;text-align:center;font-size:7.8pt;font-weight:850}.flow div:not(:last-child)::after{content:"›";position:absolute;right:-2mm;top:50%;z-index:2;transform:translateY(-52%);font-size:16pt}
+    .checklist{display:grid;gap:2.2mm}.check{display:grid;grid-template-columns:7mm 1fr;gap:2mm;align-items:start;padding:2.8mm 3mm;border:1px solid var(--line);border-radius:3mm}.box{width:5mm;height:5mm;border:.5mm solid var(--teal);border-radius:1mm}.check p{margin:0;font-size:8.2pt}
+    .cover{padding:0;background:var(--night);color:white}.cover-art{position:absolute;inset:0;overflow:hidden}.cover-art::before{content:"";position:absolute;width:185mm;height:185mm;right:-73mm;top:-66mm;border-radius:50%;background:var(--orange)}.cover-art::after{content:"";position:absolute;width:135mm;height:135mm;left:-62mm;bottom:-52mm;border-radius:50%;border:20mm solid rgba(11,159,145,.35)}.cover-content{position:relative;z-index:2;padding:25mm 20mm}.brand{display:flex;align-items:center;gap:4mm;margin-bottom:43mm;font-weight:850}.logo{display:grid;width:16mm;height:16mm;place-items:center;border-radius:5mm;background:white;color:var(--teal);font-size:22pt}.cover h1{max-width:145mm;margin-bottom:7mm;color:white}.cover .subtitle{max-width:135mm;color:#cee5e2;font-size:15pt;line-height:1.38}.cover-meta{position:absolute;left:20mm;bottom:24mm;display:flex;gap:8mm;align-items:center;color:#afcbc7;font-size:8.5pt}.pill{padding:2mm 3mm;border:1px solid #46646a;border-radius:20mm;color:white}
+    .final{background:linear-gradient(155deg,var(--night) 0 62%,#d77c17 62%);color:white}.final::before,.final::after{color:#c7d8d5}.final h2,.final h3,.final strong{color:white}.final .card{border-color:#36545a;background:rgba(255,255,255,.07)}.final p,.final .small{color:#d7e6e3}.rule{height:1px;margin:5mm 0;background:var(--line)}
+    @media print{html,body{background:white}.page{margin:0;box-shadow:none}*{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <div class="cover-art"></div><div class="cover-content">
+      <div class="brand"><span class="logo">🦷</span><span>Clínica Sorriso e Vida</span></div>
+      <div class="eyebrow" style="color:#ffc575">Guia do sócio • homologação</div>
+      <h1>Roteiro de teste<br>em dupla</h1>
+      <p class="subtitle">Prepare os dados, conecte o Evolution, teste o bot com dois celulares e confira tudo no painel administrativo.</p>
+      <div class="cover-meta"><span class="pill">Passo a passo</span><span>Outubro de 2026</span></div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Visão geral</div><h2>O que vocês vão provar</h2><p class="lead">O objetivo é testar o caminho inteiro: WhatsApp → Evolution → bot → agenda → painel administrativo.</p></div><span class="section-no">1</span></div>
+    <div class="flow"><div>Preparar dados</div><div>Conectar número</div><div>Mandar mensagem</div><div>Agendar</div><div>Conferir painel</div></div>
+    <div class="roles">
+      <div class="role a"><div class="big">A</div><h3>Sócio administrador</h3><p>Entra no servidor, prepara os exemplos, abre o Evolution e acompanha o painel.</p></div>
+      <div class="role b"><div class="big">B</div><h3>Sócio paciente</h3><p>Usa um segundo celular para conversar com o bot, escolher data e concluir agendamentos.</p></div>
+    </div>
+    <h3 style="margin-top:7mm">Antes de começar</h3>
+    <div class="checklist">
+      <div class="check"><span class="box"></span><p>Ter acesso SSH ao servidor e estar dentro da pasta do projeto.</p></div>
+      <div class="check"><span class="box"></span><p>Ter o endereço do painel administrativo e a conta de acesso.</p></div>
+      <div class="check"><span class="box"></span><p>Separar <strong>três números</strong>: o número da clínica conectado ao Evolution e os dois celulares que enviarão mensagens.</p></div>
+      <div class="check"><span class="box"></span><p>Adicionar os dois celulares à lista <strong>EVOLUTION_ALLOWED_NUMBERS</strong> da homologação.</p></div>
+      <div class="check"><span class="box"></span><p>Usar uma data futura. O comando informará qual segunda-feira ficará bloqueada.</p></div>
+    </div>
+    <div class="warning"><strong>Faça o teste na homologação.</strong> Não use “migrate:fresh”, não apague instâncias e não conecte o WhatsApp pessoal principal.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Servidor</div><h2>Popular os dados básicos</h2><p class="lead">Primeiro publique esta versão do projeto. Depois execute um dos comandos abaixo na pasta do sistema.</p></div><span class="section-no">2</span></div>
+    <h3>Forma recomendada — Docker Compose</h3>
+    <div class="command"><span class="comment"># dentro da pasta do projeto</span><br>docker compose exec -T app php artisan demo:prepare-partner-test</div>
+    <h3 style="margin-top:5mm">Forma direta — docker exec</h3>
+    <div class="command">docker exec -it clinica-sorriso-e-vida-app-1 <br>  php artisan demo:prepare-partner-test</div>
+    <h3 style="margin-top:5mm">Atalho incluído no projeto</h3>
+    <div class="command">./bin/prepare-partner-demo</div>
+    <div class="success"><strong>Pode repetir:</strong> o comando atualiza os mesmos registros em vez de criar cópias. A data bloqueada é renovada para a próxima segunda-feira.</div>
+    <h3 style="margin-top:6mm">O que deve aparecer no terminal</h3>
+    <div class="command">Ambiente de demonstração preparado com sucesso.<br><br>Dentistas: Dra. Ana Sorriso e Dr. Bruno Vida<br>Procedimentos: 4 opções de teste<br>Expediente: segunda a sexta, 08:00–12:00 e 14:00–18:00<br>Data indisponível: <strong>DD/MM/AAAA</strong> para Dra. Ana Sorriso</div>
+    <div class="warning danger"><strong>Proteção:</strong> em ambiente marcado como produção o comando é bloqueado. O parâmetro <strong>--force</strong> existe para emergência consciente, mas não é recomendado para este teste.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Dados criados</div><h2>O cenário de demonstração</h2></div><span class="section-no">3</span></div>
+    <div class="grid-2">
+      <div class="card soft"><div class="icon">A</div><h3>Dra. Ana Sorriso</h3><p><strong>Especialidade:</strong> Clínica geral</p><p><strong>Atende:</strong> avaliação, limpeza, restauração simples e avaliação de clareamento.</p><p><strong>Exceção:</strong> fica indisponível na data indicada pelo comando.</p></div>
+      <div class="card warm"><div class="icon">B</div><h3>Dr. Bruno Vida</h3><p><strong>Especialidade:</strong> Dentística</p><p><strong>Atende:</strong> avaliação, limpeza e restauração simples.</p><p><strong>Exceção:</strong> continua disponível na mesma data bloqueada para Ana.</p></div>
+    </div>
+    <div class="shot-wrap"><img class="shot" src="../manual/assets/09-dentistas-lista.png" alt="Lista com dois dentistas"><span class="caption">Painel › Dentistas após executar o comando</span></div>
+    <table>
+      <tr><th>Procedimento</th><th>Duração</th><th>Valor de demonstração</th></tr>
+      <tr><td>Avaliação odontológica</td><td>30 minutos</td><td>R$ 120,00</td></tr>
+      <tr><td>Limpeza</td><td>45 minutos</td><td>R$ 180,00</td></tr>
+      <tr><td>Restauração simples</td><td>60 minutos</td><td>R$ 250,00</td></tr>
+      <tr><td>Clareamento — avaliação</td><td>30 minutos</td><td>Sob consulta</td></tr>
+    </table>
+    <div class="tip"><strong>A lógica do teste:</strong> na data bloqueada, a Dra. Ana não deve mostrar horários. O Dr. Bruno deve continuar oferecendo horários livres.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Homologação</div><h2>Liberar os dois celulares</h2><p class="lead">A lista de permissão impede que outras pessoas conversem com o bot enquanto vocês testam.</p></div><span class="section-no">4</span></div>
+    <h3>1. Abra o arquivo de ambiente</h3><div class="command">nano .env</div>
+    <h3>2. Preencha os números autorizados</h3><div class="command">EVOLUTION_ALLOWED_NUMBERS=5595988887777,5595977776666</div>
+    <ul><li>Use <strong>55 + DDD + número</strong>, sem “+”, espaços, parênteses ou traços.</li><li>Separe os dois números com vírgula, sem espaço.</li><li>Use exatamente o número reconhecido pelo WhatsApp daquela linha.</li></ul>
+    <h3>3. Reaplique o ambiente do servidor</h3><div class="command"><span class="comment"># fluxo recomendado do projeto</span><br>make install</div>
+    <div class="warning"><strong>Por que não basta “restart”?</strong> Alterações no arquivo <strong>.env</strong> precisam entrar novamente nos contêineres. O instalador também limpa e recria o cache de configuração.</div>
+    <h3 style="margin-top:6mm">4. Confira os serviços</h3><div class="command">docker compose ps</div>
+    <table><tr><th>Serviço</th><th>Estado esperado</th><th>Função</th></tr><tr><td>app / nginx</td><td>Up</td><td>Painel e webhook.</td></tr><tr><td>queue</td><td>Up</td><td>Processa a conversa e envia respostas.</td></tr><tr><td>scheduler</td><td>Up</td><td>Dispara lembretes.</td></tr><tr><td>evolution</td><td>Up</td><td>Conecta o WhatsApp.</td></tr><tr><td>postgres / redis</td><td>Up / healthy</td><td>Dados, sessão e fila.</td></tr></table>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Evolution Manager</div><h2>Entrar no gerenciador</h2></div><span class="section-no">5</span></div>
+    <div class="path">Navegador <span class="arrow">›</span> <b>http://IP-DO-SERVIDOR:PORTA/manager/</b></div>
+    <div class="shot-wrap"><img class="shot tall center" src="../manual/assets/evolution-01-login.png" alt="Login do Evolution Manager"><span class="caption">Evolution Manager 2.3.7 — tela de entrada</span></div>
+    <table><tr><th>Campo</th><th>O que colocar</th></tr><tr><td>Server URL</td><td>O endereço-base do Evolution, <strong>sem /manager</strong>. Ex.: http://IP:8081 ou o domínio HTTPS configurado.</td></tr><tr><td>API Key Global</td><td>O valor de <strong>EVOLUTION_API_KEY</strong> no arquivo .env. Não envie essa chave por WhatsApp e não a mostre em capturas.</td></tr></table>
+    <div class="tip"><strong>No ambiente local:</strong> o endereço padrão é <strong>http://localhost:8081/manager/</strong> e o Server URL é <strong>http://localhost:8081</strong>.</div>
+    <div class="warning"><strong>“Invalid server”:</strong> confira se o endereço abre no navegador, se está usando HTTPS quando exigido e se não colocou “/manager” no Server URL.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Evolution Manager</div><h2>Criar ou localizar a instância</h2></div><span class="section-no">6</span></div>
+    <div class="shot-wrap"><img class="shot tall" src="assets/evolution-02-instancias.png" alt="Lista de instâncias"><span class="caption">Lista de instâncias do Evolution</span></div>
+    <div class="grid-2">
+      <div><h3>Se a instância já existe</h3><ol><li>Procure <strong>clinica-sorriso-e-vida</strong>.</li><li>Clique no nome da instância.</li><li>Não crie outra com nome parecido.</li></ol></div>
+      <div><h3>Se a lista está vazia</h3><ol><li>Clique em <strong>Instance +</strong>.</li><li>Nome: o mesmo valor de <strong>EVOLUTION_INSTANCE</strong>.</li><li>Canal/integração: <strong>WhatsApp Baileys</strong>.</li><li>Crie a instância.</li></ol></div>
+    </div>
+    <div class="warning"><strong>O nome precisa coincidir.</strong> O sistema envia mensagens usando a instância configurada no .env. Se os nomes forem diferentes, o bot recebe ou envia pelo lugar errado.</div>
+    <h3 style="margin-top:6mm">Como ler o status</h3>
+    <table><tr><th>Status</th><th>Significado</th></tr><tr><td>Connecting</td><td>A instância existe, mas ainda espera a leitura do QR Code.</td></tr><tr><td>Open / Connected</td><td>O telefone está conectado e pronto para trocar mensagens.</td></tr><tr><td>Close / Disconnected</td><td>A sessão caiu ou foi desconectada; gere novo QR se necessário.</td></tr></table>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Evolution Manager</div><h2>Conectar pelo QR Code</h2></div><span class="section-no">7</span></div>
+    <div class="shot-wrap"><img class="shot" src="assets/evolution-03-detalhe.png" alt="Detalhe da instância Evolution"><span class="caption">Abra a instância e clique em “Get QR Code”</span></div>
+    <div class="grid-2" style="align-items:start">
+      <div><div class="steps">
+        <div class="step"><b>1</b><div><h3>No Evolution</h3><p>Clique em <strong>Get QR Code</strong>.</p></div></div>
+        <div class="step"><b>2</b><div><h3>No celular da clínica</h3><p>WhatsApp › Configurações/Menu › <strong>Aparelhos conectados</strong>.</p></div></div>
+        <div class="step"><b>3</b><div><h3>Vincular aparelho</h3><p>Toque em <strong>Conectar um aparelho</strong> e leia o código exibido no computador.</p></div></div>
+        <div class="step"><b>4</b><div><h3>Aguardar</h3><p>Feche a janela somente quando o status mudar para conectado.</p></div></div>
+      </div></div>
+      <div class="shot-wrap" style="margin:0"><img class="shot center" style="height:82mm" src="assets/evolution-04-qrcode.png" alt="Exemplo de QR Code"><span class="caption">Exemplo — gere um código novo na hora</span></div>
+    </div>
+    <div class="warning"><strong>O QR da imagem é apenas ilustrativo e expira.</strong> Sempre clique em “Get QR Code” para gerar um código atual.</div>
+    <div class="tip"><strong>Boas práticas:</strong> mantenha o celular conectado à internet, use um número dedicado ao teste e não clique em Disconnect/Delete durante a validação.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Painel administrativo</div><h2>O básico que seu sócio precisa</h2></div><span class="section-no">8</span></div>
+    <div class="path">Endereço do sistema <span class="arrow">›</span> <b>/admin</b> <span class="arrow">›</span> e-mail e senha</div>
+    <div class="grid-3">
+      <div class="card soft"><div class="icon">1</div><h3>Painel de Controle</h3><p>Mostra consultas do dia, confirmadas, concluídas, canceladas e faltas.</p></div>
+      <div class="card soft"><div class="icon">2</div><h3>Agenda</h3><p>Lista consultas, pesquisa paciente e permite confirmar, iniciar, concluir ou cancelar.</p></div>
+      <div class="card soft"><div class="icon">3</div><h3>Cadastros</h3><p>Dentistas, pacientes, procedimentos, horários e bloqueios.</p></div>
+    </div>
+    <div class="shot-wrap"><img class="shot" src="../manual/assets/12-bloqueios-lista.png" alt="Bloqueio no painel"><span class="caption">Bloqueios da agenda — a data criada pelo comando</span></div>
+    <h3>Durante o teste, use principalmente</h3>
+    <table><tr><th>Menu</th><th>O que conferir</th></tr><tr><td>Agenda</td><td>Se os dois agendamentos chegaram, origem WhatsApp, data, paciente e profissional.</td></tr><tr><td>Dentistas</td><td>Se Ana e Bruno estão ativos e ligados aos procedimentos.</td></tr><tr><td>Horários de trabalho</td><td>Segunda a sexta, manhã e tarde, para os dois.</td></tr><tr><td>Bloqueios da agenda</td><td>A próxima segunda-feira indisponível para Dra. Ana.</td></tr></table>
+    <div class="tip"><strong>Dica:</strong> a Agenda abre com o filtro “Hoje”. Se o teste for para outro dia, remova esse filtro para encontrar a consulta.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Teste 1 • celular A</div><h2>Agendamento que deve funcionar</h2><p class="lead">Use o Dr. Bruno na data bloqueada para a Dra. Ana. Isso prova que o bloqueio é individual.</p></div><span class="section-no">9</span></div>
+    <div class="steps">
+      <div class="step"><b>1</b><div><h3>Abra a conversa</h3><p>No celular A, envie <strong>menu</strong> ao número conectado no Evolution.</p></div></div>
+      <div class="step"><b>2</b><div><h3>Escolha agendar</h3><p>Responda <strong>1</strong>. Informe o nome completo se o bot pedir.</p></div></div>
+      <div class="step"><b>3</b><div><h3>Escolha um procedimento comum</h3><p>Use <strong>Avaliação odontológica</strong>, <strong>Limpeza</strong> ou <strong>Restauração simples</strong>.</p></div></div>
+      <div class="step"><b>4</b><div><h3>Escolha Dr. Bruno Vida</h3><p>Responda com o número exibido ao lado do nome — a ordem pode variar.</p></div></div>
+      <div class="step"><b>5</b><div><h3>Digite a data bloqueada</h3><p>Use a data que apareceu no terminal ao executar o comando.</p></div></div>
+      <div class="step"><b>6</b><div><h3>Escolha um horário e confirme</h3><p>Responda com o número do horário e depois <strong>sim</strong>.</p></div></div>
+    </div>
+    <div class="success"><strong>Resultado esperado:</strong> “Consulta agendada com sucesso”. No painel, a consulta aparece para Dr. Bruno com origem WhatsApp.</div>
+    <h3 style="margin-top:6mm">Conferência no painel</h3>
+    <div class="checklist">
+      <div class="check"><span class="box"></span><p>Paciente criado com o mesmo número do celular A.</p></div>
+      <div class="check"><span class="box"></span><p>Procedimento, Dr. Bruno, data e horário corretos.</p></div>
+      <div class="check"><span class="box"></span><p>Status inicial <strong>Agendada</strong> e origem <strong>WhatsApp</strong>.</p></div>
+      <div class="check"><span class="box"></span><p>Enviar <strong>confirmar</strong> no celular A muda o status para Confirmada.</p></div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Teste 2 • celular B</div><h2>Bloqueio e nova tentativa</h2><p class="lead">Agora escolha a Dra. Ana na mesma data. O bot deve impedir aquele dia e aceitar outra data livre.</p></div><span class="section-no">10</span></div>
+    <div class="grid-2">
+      <div class="card warm"><span class="badge orange">Parte A</span><h3 style="margin-top:3mm">Provar o bloqueio</h3><ol><li>Envie <strong>menu</strong>.</li><li>Escolha <strong>1 — Agendar consulta</strong>.</li><li>Escolha qualquer procedimento atendido por Ana.</li><li>Escolha <strong>Dra. Ana Sorriso</strong>.</li><li>Digite a data bloqueada.</li></ol><p><strong>Esperado:</strong> “Não há horários livres nessa data”.</p></div>
+      <div class="card soft"><span class="badge green">Parte B</span><h3 style="margin-top:3mm">Concluir em outra data</h3><ol><li>Sem reiniciar, envie outra data útil.</li><li>Escolha um horário livre.</li><li>Confira o resumo.</li><li>Responda <strong>sim</strong>.</li></ol><p><strong>Esperado:</strong> consulta criada para Ana na nova data.</p></div>
+    </div>
+    <h3 style="margin-top:7mm">Depois, testem juntos</h3>
+    <table><tr><th>Ação</th><th>Mensagem</th><th>O que conferir</th></tr><tr><td>Listar</td><td>status</td><td>Cada celular vê somente as próprias consultas.</td></tr><tr><td>Reagendar</td><td>menu → 4</td><td>Nova data/horário aparecem no painel.</td></tr><tr><td>Cancelar</td><td>menu → 3</td><td>Status vira Cancelada e permanece no histórico.</td></tr><tr><td>Interromper</td><td>sair</td><td>Fluxo atual termina; “menu” começa novamente.</td></tr></table>
+    <div class="warning"><strong>Não compare pelo número da opção.</strong> Leiam sempre o nome exibido, pois a ordenação depende dos cadastros disponíveis.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Diagnóstico rápido</div><h2>Se o bot não responder</h2></div><span class="section-no">11</span></div>
+    <table>
+      <tr><th>Sintoma</th><th>Conferência</th><th>Comando útil</th></tr>
+      <tr><td>Nenhuma resposta</td><td>Evolution conectado, celular autorizado e worker da fila ativo.</td><td>docker compose ps</td></tr>
+      <tr><td>Mensagem chega, mas trava</td><td>Logs do queue e do app.</td><td>docker compose logs --tail=100 queue app</td></tr>
+      <tr><td>Evolution desconectado</td><td>Abra a instância e gere novo QR Code.</td><td>—</td></tr>
+      <tr><td>Procedimento não aparece</td><td>Ativo e vinculado ao dentista no painel.</td><td>—</td></tr>
+      <tr><td>Data sem horário para ambos</td><td>Expediente, antecedência mínima, duração e consultas existentes.</td><td>—</td></tr>
+      <tr><td>Só um celular funciona</td><td>Formato dos dois números em EVOLUTION_ALLOWED_NUMBERS.</td><td>—</td></tr>
+    </table>
+    <h3 style="margin-top:7mm">Estado da conexão pela aplicação</h3>
+    <div class="command">docker compose exec -T app php artisan tinker <br>  --execute="dump(app(App\Services\Evolution\EvolutionApiClient::class)->connectionState());"</div>
+    <p class="small">A saída esperada contém estado aberto/conectado. O comando não envia mensagem.</p>
+    <h3 style="margin-top:6mm">Reiniciar apenas os processadores</h3><div class="command">docker compose restart queue scheduler</div>
+    <div class="warning danger"><strong>Não use como tentativa:</strong> migrate:fresh, docker compose down -v, apagar a instância ou remover volumes. Esses comandos podem apagar dados e sessões.</div>
+    <div class="tip"><strong>Ao pedir ajuda técnica:</strong> anote horário, número usado, texto enviado, resposta recebida e tire captura do status do Evolution e da Agenda.</div>
+  </section>
+
+  <section class="page final">
+    <div class="header"><div><div class="eyebrow" style="color:#ffc575">Encerramento</div><h2>Checklist de aprovação</h2></div><span class="section-no">12</span></div>
+    <div class="checklist">
+      <div class="check"><span class="box" style="border-color:#fff"></span><p>Comando de demonstração executado sem erro.</p></div>
+      <div class="check"><span class="box" style="border-color:#fff"></span><p>Dois dentistas, quatro procedimentos e bloqueio visíveis no painel.</p></div>
+      <div class="check"><span class="box" style="border-color:#fff"></span><p>Evolution mostra a instância correta como conectada.</p></div>
+      <div class="check"><span class="box" style="border-color:#fff"></span><p>Os dois celulares recebem resposta ao enviar “menu”.</p></div>
+      <div class="check"><span class="box" style="border-color:#fff"></span><p>Dr. Bruno aceita horário na data bloqueada para Ana.</p></div>
+      <div class="check"><span class="box" style="border-color:#fff"></span><p>Dra. Ana rejeita a data bloqueada e aceita outra data.</p></div>
+      <div class="check"><span class="box" style="border-color:#fff"></span><p>As duas consultas aparecem no painel com origem WhatsApp.</p></div>
+      <div class="check"><span class="box" style="border-color:#fff"></span><p>Confirmação, reagendamento e cancelamento funcionam.</p></div>
+    </div>
+    <div class="rule" style="background:#3d5960;margin:8mm 0"></div>
+    <div class="grid-2"><div class="card"><h3>Comando principal</h3><p style="font-family:monospace;font-size:8pt">docker compose exec -T app php artisan demo:prepare-partner-test</p></div><div class="card"><h3>Palavra para começar</h3><p style="font-size:22pt;font-weight:900;color:#ffc575">menu</p></div></div>
+    <div style="margin-top:16mm;max-width:145mm"><div class="logo" style="margin-bottom:5mm">🦷</div><h2 style="font-size:27pt">Teste aprovado = fluxo completo funcionando.</h2><p style="font-size:11pt">Guardem as capturas dos dois celulares e da Agenda. Elas serão a evidência da homologação.</p><p class="small" style="margin-top:8mm">Referência técnica: Evolution API/Manager v2.3.7 • Este guia não contém chaves nem senhas.</p></div>
+  </section>
+</body>
+</html>

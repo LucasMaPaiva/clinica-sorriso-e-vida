@@ -40,7 +40,7 @@ class AppointmentResource extends Resource
 
     public static function form(Schema $s): Schema
     {
-        return $s->components([Select::make('patient_id')->label('Paciente')->relationship('patient', 'name')->searchable(['name', 'phone'])->preload()->required(), Select::make('dentist_id')->label('Dentista')->relationship('dentist', 'name', fn ($q) => $q->where('active', true))->searchable()->preload()->required(), Select::make('procedure_id')->label('Procedimento')->relationship('procedure', 'name', fn ($q) => $q->where('active', true))->searchable()->preload()->required(), DateTimePicker::make('starts_at')->label('Data e horário')->seconds(false)->required(), Select::make('status')->label('Status')->options(AppointmentStatus::class)->default(AppointmentStatus::Scheduled->value)->required()->native(false), Textarea::make('notes')->label('Observações')->columnSpanFull()]);
+        return $s->components([Select::make('patient_id')->label('Paciente')->relationship('patient', 'name')->searchable(['name', 'phone'])->preload()->required(), Select::make('dentist_id')->label('Dentista')->relationship('dentist', 'name', fn ($query) => $query->where('active', true))->searchable()->preload()->required(), Select::make('procedure_id')->label('Procedimento')->relationship('procedure', 'name', fn ($query) => $query->where('active', true))->searchable()->preload()->required(), DateTimePicker::make('starts_at')->label('Data e horário')->seconds(false)->required(), Select::make('status')->label('Status')->options(AppointmentStatus::class)->default(AppointmentStatus::Scheduled->value)->required()->native(false), Textarea::make('notes')->label('Observações')->columnSpanFull()]);
     }
 
     public static function table(Table $t): Table

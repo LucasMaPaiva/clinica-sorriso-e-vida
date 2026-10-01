@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manual de Uso — Clínica Sorriso e Vida</title>
+  <style>
+    :root {
+      --ink: #17333b;
+      --muted: #5f7479;
+      --teal: #0f9f91;
+      --teal-dark: #08766e;
+      --teal-soft: #dff5f1;
+      --mint: #effaf7;
+      --coral: #ee7868;
+      --amber: #f3b83f;
+      --paper: #ffffff;
+      --line: #d9e8e5;
+      --night: #112b33;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #dfe9e7; color: var(--ink); font-family: Inter, "Segoe UI", Arial, sans-serif; }
+    body { counter-reset: page; }
+    @page { size: A4; margin: 0; }
+
+    .page {
+      position: relative;
+      width: 210mm;
+      height: 297mm;
+      margin: 0 auto 8mm;
+      padding: 15mm 16mm 13mm;
+      overflow: hidden;
+      background: var(--paper);
+      page-break-after: always;
+      counter-increment: page;
+    }
+    .page:last-child { page-break-after: auto; }
+    .page::after {
+      content: counter(page, decimal-leading-zero);
+      position: absolute;
+      right: 16mm;
+      bottom: 7mm;
+      color: #789096;
+      font-size: 8pt;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+    .page::before {
+      content: "CLÍNICA SORRISO E VIDA  •  MANUAL DE USO";
+      position: absolute;
+      left: 16mm;
+      bottom: 7mm;
+      color: #789096;
+      font-size: 7.2pt;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+    .cover::before, .cover::after { display: none; }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: 31pt; line-height: 1.03; letter-spacing: -.04em; }
+    h2 { margin-bottom: 3mm; font-size: 20pt; line-height: 1.08; letter-spacing: -.025em; }
+    h3 { margin-bottom: 2mm; font-size: 11.5pt; }
+    p, li, td, th { font-size: 9.2pt; line-height: 1.45; }
+    p { margin-bottom: 3mm; }
+    ul, ol { margin: 1.5mm 0 3mm; padding-left: 5mm; }
+    li { margin-bottom: 1.3mm; }
+    strong { color: var(--night); }
+    .eyebrow { margin-bottom: 2.5mm; color: var(--teal-dark); font-size: 8pt; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+    .lead { max-width: 165mm; color: var(--muted); font-size: 11pt; line-height: 1.5; }
+    .small { color: var(--muted); font-size: 7.8pt; line-height: 1.4; }
+    .accent { color: var(--teal-dark); }
+
+    .header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8mm; margin-bottom: 7mm; }
+    .section-no { flex: 0 0 auto; display: grid; width: 14mm; height: 14mm; place-items: center; border-radius: 50%; background: var(--teal); color: white; font-size: 11pt; font-weight: 900; }
+    .rule { height: 1px; margin: 4mm 0; background: var(--line); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+    .card { padding: 4.5mm; border: 1px solid var(--line); border-radius: 4mm; background: #fff; }
+    .card.soft { background: var(--mint); }
+    .card.dark { border: 0; background: var(--night); color: white; }
+    .card.dark strong, .card.dark h3 { color: white; }
+    .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+    .icon { display: grid; width: 10mm; height: 10mm; margin-bottom: 3mm; place-items: center; border-radius: 3mm; background: var(--teal-soft); color: var(--teal-dark); font-size: 16pt; }
+    .badge { display: inline-block; padding: 1.1mm 2.4mm; border-radius: 20mm; background: var(--teal-soft); color: var(--teal-dark); font-size: 7.4pt; font-weight: 800; }
+    .badge.coral { background: #feebe8; color: #a34035; }
+    .badge.amber { background: #fff3d5; color: #8a6207; }
+
+    .path { display: flex; align-items: center; gap: 2mm; margin: 3mm 0 5mm; padding: 3mm 4mm; border-radius: 3mm; background: var(--night); color: white; font-size: 8.5pt; font-weight: 750; }
+    .path b { color: #66e1d2; }
+    .arrow { color: #91aaa9; }
+
+    .shot-wrap { position: relative; margin: 4mm 0 5mm; overflow: hidden; border: 1px solid #284148; border-radius: 4mm; box-shadow: 0 3mm 8mm rgba(17, 43, 51, .10); }
+    .shot { display: block; width: 100%; height: 66mm; object-fit: cover; object-position: top; }
+    .shot.tall { height: 82mm; }
+    .shot.login { height: 72mm; object-position: center; }
+    .caption { position: absolute; left: 3mm; bottom: 3mm; padding: 1.5mm 2.5mm; border-radius: 2mm; background: rgba(17,43,51,.9); color: white; font-size: 7pt; }
+
+    table { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 3mm; }
+    th { padding: 2.4mm 3mm; background: var(--night); color: white; text-align: left; font-size: 7.8pt; letter-spacing: .03em; text-transform: uppercase; }
+    td { padding: 2.2mm 3mm; border-top: 1px solid var(--line); vertical-align: top; font-size: 8.1pt; line-height: 1.34; }
+    tr:first-child td { border-top: 0; }
+    td:first-child { width: 28%; color: var(--teal-dark); font-weight: 800; }
+    .required::after { content: " *"; color: var(--coral); }
+
+    .tip, .warning, .success {
+      margin: 4mm 0;
+      padding: 3.5mm 4mm;
+      border-left: 1.5mm solid var(--teal);
+      border-radius: 0 3mm 3mm 0;
+      background: var(--mint);
+      font-size: 8.6pt;
+      line-height: 1.4;
+    }
+    .warning { border-color: var(--amber); background: #fff8e6; }
+    .success { border-color: #31a96f; background: #eaf8f0; }
+
+    .steps { display: grid; gap: 3mm; }
+    .step { display: grid; grid-template-columns: 10mm 1fr; gap: 3mm; align-items: start; }
+    .step > b { display: grid; width: 9mm; height: 9mm; place-items: center; border-radius: 50%; background: var(--teal); color: white; font-size: 8.5pt; }
+    .step p { margin: .6mm 0 0; }
+
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2mm; align-items: stretch; margin: 6mm 0; }
+    .flow > div { position: relative; padding: 4mm 2.5mm; border-radius: 3mm; background: var(--teal-soft); color: var(--teal-dark); text-align: center; font-size: 8pt; font-weight: 850; }
+    .flow > div:not(:last-child)::after { content: "›"; position: absolute; right: -2.1mm; top: 50%; z-index: 2; transform: translateY(-54%); color: var(--teal-dark); font-size: 16pt; }
+
+    .phone { width: 82mm; margin: 0 auto; padding: 4mm 3.5mm; border: 2mm solid var(--night); border-radius: 9mm; background: #e9f0eb; box-shadow: 0 3mm 8mm rgba(17,43,51,.12); }
+    .phone-head { margin: -4mm -3.5mm 4mm; padding: 3mm 4mm; border-radius: 6mm 6mm 0 0; background: #075e54; color: white; font-size: 9pt; font-weight: 800; }
+    .bubble { max-width: 88%; margin: 2mm 0; padding: 2.5mm 3mm; border-radius: 3mm; background: white; font-size: 7.8pt; line-height: 1.36; box-shadow: 0 .5mm 1mm rgba(0,0,0,.07); }
+    .bubble.me { margin-left: auto; background: #d6f8c6; }
+    .bubble b { color: #0b5049; }
+    .chat-time { float: right; margin-left: 2mm; color: #70847c; font-size: 6pt; }
+
+    .checklist { display: grid; gap: 2.2mm; }
+    .check { display: grid; grid-template-columns: 7mm 1fr; gap: 2mm; align-items: start; padding: 2.8mm 3mm; border: 1px solid var(--line); border-radius: 3mm; }
+    .box { width: 5mm; height: 5mm; border: .5mm solid var(--teal-dark); border-radius: 1mm; }
+    .check p { margin: 0; font-size: 8.3pt; }
+
+    .cover { padding: 0; background: var(--night); color: white; }
+    .cover-art { position: absolute; inset: 0; overflow: hidden; }
+    .cover-art::before { content: ""; position: absolute; width: 180mm; height: 180mm; right: -70mm; top: -60mm; border-radius: 50%; background: var(--teal); opacity: .88; }
+    .cover-art::after { content: ""; position: absolute; width: 120mm; height: 120mm; left: -62mm; bottom: -44mm; border-radius: 50%; border: 18mm solid rgba(102,225,210,.18); }
+    .cover-content { position: relative; z-index: 2; padding: 26mm 20mm; }
+    .brand { display: flex; align-items: center; gap: 4mm; margin-bottom: 47mm; font-weight: 850; }
+    .tooth { display: grid; width: 16mm; height: 16mm; place-items: center; border-radius: 5mm; background: white; color: var(--teal-dark); font-size: 23pt; }
+    .cover h1 { max-width: 155mm; margin-bottom: 7mm; color: white; font-size: 42pt; }
+    .cover .subtitle { max-width: 135mm; color: #c9e8e3; font-size: 16pt; line-height: 1.35; }
+    .cover-meta { position: absolute; left: 20mm; bottom: 24mm; display: flex; gap: 8mm; align-items: center; color: #a9c9c5; font-size: 8.5pt; }
+    .cover-pill { padding: 2mm 3mm; border: 1px solid #3e6268; border-radius: 20mm; color: white; }
+
+    .contents { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm 8mm; margin-top: 6mm; }
+    .contents div { display: flex; justify-content: space-between; padding: 2.6mm 0; border-bottom: 1px solid var(--line); font-size: 8.6pt; }
+    .contents b { color: var(--teal-dark); }
+
+    .status-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5mm; }
+    .status { padding: 3mm; border-radius: 3mm; background: #f3f7f7; font-size: 7.8pt; line-height: 1.35; }
+    .status b { display: block; margin-bottom: 1mm; }
+    .status.green { background: #eaf8f0; }
+    .status.yellow { background: #fff5d9; }
+    .status.blue { background: #e9f3fb; }
+    .status.red { background: #feebe8; }
+
+    .final { background: linear-gradient(155deg, var(--night) 0 62%, #0c7e75 62%); color: white; }
+    .final::before, .final::after { color: #b7d1cd; }
+    .final h2, .final h3, .final strong { color: white; }
+    .final .card { border-color: #35545a; background: rgba(255,255,255,.07); }
+    .final .small, .final p { color: #d2e4e1; }
+
+    @media print {
+      html, body { background: white; }
+      .page { margin: 0; box-shadow: none; }
+      * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="page cover">
+    <div class="cover-art"></div>
+    <div class="cover-content">
+      <div class="brand"><span class="tooth">🦷</span><span>Clínica Sorriso e Vida</span></div>
+      <div class="eyebrow" style="color:#66e1d2">Manual prático para recepção e pacientes</div>
+      <h1>Painel de agendamentos<br>+ Bot no WhatsApp</h1>
+      <p class="subtitle">Um guia simples, visual e campo por campo para configurar a agenda, atender no dia a dia e orientar o paciente.</p>
+      <div class="cover-meta"><span class="cover-pill">Versão 1.0</span><span>Outubro de 2026</span></div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Antes de começar</div><h2>Como usar este manual</h2><p class="lead">Siga a ordem indicada na primeira configuração. Depois, use as páginas de consulta rápida no trabalho diário.</p></div><span class="section-no">1</span></div>
+    <div class="grid-3">
+      <div class="card soft"><div class="icon">⚙</div><h3>Configurar</h3><p>Cadastre profissionais, procedimentos e horários de atendimento.</p></div>
+      <div class="card soft"><div class="icon">▣</div><h3>Agendar</h3><p>A recepção cria e acompanha consultas pelo painel.</p></div>
+      <div class="card soft"><div class="icon">◉</div><h3>Automatizar</h3><p>O paciente agenda, consulta, cancela e reagenda pelo WhatsApp.</p></div>
+    </div>
+    <div class="rule"></div>
+    <h3>Ordem recomendada para a primeira configuração</h3>
+    <div class="flow"><div>Dentistas</div><div>Procedimentos</div><div>Horários</div><div>Bloqueios</div><div>Agenda</div></div>
+    <div class="tip"><strong>Por que essa ordem?</strong> O sistema só oferece ao paciente horários de um dentista ativo, ligado a um procedimento ativo e com horário de trabalho cadastrado.</div>
+    <h3 style="margin-top:6mm">Conteúdo</h3>
+    <div class="contents">
+      <div><span>Acesso e painel inicial</span><b>03</b></div><div><span>Cadastro de pacientes</span><b>04</b></div>
+      <div><span>Cadastro de dentistas</span><b>05</b></div><div><span>Procedimentos</span><b>06</b></div>
+      <div><span>Horários de trabalho</span><b>07</b></div><div><span>Bloqueios da agenda</span><b>08</b></div>
+      <div><span>Nova consulta</span><b>09</b></div><div><span>Rotina da agenda</span><b>10</b></div>
+      <div><span>Bot no WhatsApp</span><b>11–13</b></div><div><span>Lembretes e regras</span><b>14</b></div>
+      <div><span>Roteiro de teste</span><b>15</b></div><div><span>Consulta rápida</span><b>16</b></div>
+    </div>
+    <div class="warning"><strong>Atenção:</strong> os nomes e horários mostrados nas imagens são exemplos. Troque-os pelos dados reais da clínica antes de liberar o bot.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Entrada no sistema</div><h2>Acesso e painel inicial</h2></div><span class="section-no">2</span></div>
+    <div class="path"><b>1</b> Abra o endereço fornecido pela clínica <span class="arrow">›</span> <b>2</b> Acrescente <strong style="color:white">/admin</strong> <span class="arrow">›</span> <b>3</b> Faça login</div>
+    <div class="shot-wrap"><img class="shot login" src="assets/00-login.png" alt="Tela de login"><span class="caption">Tela de entrada do painel</span></div>
+    <div class="grid-2">
+      <div>
+        <h3>Campos de acesso</h3>
+        <table><tr><th>Campo</th><th>O que preencher</th></tr><tr><td class="required">E-mail</td><td>O e-mail administrativo entregue pelo responsável do sistema.</td></tr><tr><td class="required">Senha</td><td>A senha correspondente. Use o ícone de olho para conferir a digitação.</td></tr><tr><td>Lembre de mim</td><td>Marque somente em computador particular e protegido da clínica.</td></tr></table>
+      </div>
+      <div>
+        <h3>O que aparece no painel</h3>
+        <div class="card soft"><p><strong>Consultas de hoje:</strong> total do dia, sem contar canceladas.</p><p><strong>Confirmadas:</strong> pacientes que já confirmaram.</p><p><strong>Concluídas:</strong> atendimentos finalizados.</p><p><strong>Canceladas ou faltas:</strong> ocorrências que exigem atenção.</p></div>
+      </div>
+    </div>
+    <div class="tip"><strong>Endereço local de teste:</strong> quando o sistema estiver rodando no próprio computador, normalmente é <strong>http://localhost:8001/admin</strong>. Em produção, use o endereço HTTPS informado pelo responsável técnico.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Cadastro básico</div><h2>Pacientes</h2><p class="lead">O paciente pode surgir automaticamente ao mandar mensagem ao bot. A recepção também pode cadastrá-lo manualmente.</p></div><span class="section-no">3</span></div>
+    <div class="path">Menu esquerdo <span class="arrow">›</span> <b>Pacientes</b> <span class="arrow">›</span> <b>Criar</b></div>
+    <div class="shot-wrap"><img class="shot" src="assets/04-pacientes.png" alt="Cadastro de paciente"><span class="caption">Formulário “Criar Paciente”</span></div>
+    <table>
+      <tr><th>Campo</th><th>Como preencher</th><th>Para que serve</th></tr>
+      <tr><td class="required">Nome completo</td><td>Nome e sobrenome, sem apelidos.</td><td>Identifica o paciente na agenda e nas mensagens.</td></tr>
+      <tr><td class="required">WhatsApp</td><td>Número com DDD. Evite espaços e números duplicados.</td><td>Liga a conversa do bot ao cadastro correto.</td></tr>
+      <tr><td>E-mail</td><td>Preencha se o paciente informar.</td><td>Dado de contato complementar.</td></tr>
+      <tr><td>Nascimento</td><td>Selecione a data no calendário.</td><td>Ajuda na identificação do paciente.</td></tr>
+      <tr><td>Observações</td><td>Informações administrativas úteis. Seja breve.</td><td>Apoio interno da recepção.</td></tr>
+      <tr><td>Ativo</td><td>Deixe ligado para permitir uso normal do cadastro.</td><td>Desligado, o bot orienta o paciente a procurar a recepção.</td></tr>
+    </table>
+    <div class="warning"><strong>Privacidade:</strong> não coloque diagnóstico, senha, documento ou informação clínica sensível no campo Observações. Registre somente o necessário para a operação da agenda.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Equipe</div><h2>Dentistas</h2><p class="lead">Cada profissional precisa estar ativo e vinculado aos procedimentos que realiza.</p></div><span class="section-no">4</span></div>
+    <div class="path">Menu esquerdo <span class="arrow">›</span> <b>Dentistas</b> <span class="arrow">›</span> <b>Criar</b></div>
+    <div class="shot-wrap"><img class="shot" src="assets/05-dentistas.png" alt="Cadastro de dentista"><span class="caption">Formulário “Criar Dentista”</span></div>
+    <table>
+      <tr><th>Campo</th><th>Como preencher</th></tr>
+      <tr><td class="required">Nome</td><td>Nome profissional que o paciente verá, por exemplo: <strong>Dra. Ana Souza</strong>.</td></tr>
+      <tr><td class="required">CRO</td><td>Registro profissional completo e único, por exemplo: <strong>CRO-RR 1234</strong>.</td></tr>
+      <tr><td>Especialidade</td><td>Área de atuação mostrada no bot, como “Clínica geral” ou “Ortodontia”.</td></tr>
+      <tr><td>Telefone / E-mail</td><td>Contatos internos do profissional. São opcionais.</td></tr>
+      <tr><td>Procedimentos</td><td>Selecione todos os atendimentos que este dentista pode realizar.</td></tr>
+      <tr><td>Ativo</td><td>Ligado: pode aparecer no bot e receber consultas. Desligado: fica indisponível para novos agendamentos.</td></tr>
+    </table>
+    <div class="tip"><strong>Vínculo indispensável:</strong> se um procedimento não estiver selecionado para o dentista, o bot não oferecerá esse profissional para aquele atendimento.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Serviços</div><h2>Procedimentos</h2><p class="lead">Aqui você define o que pode ser agendado, quanto tempo ocupa e quais profissionais atendem.</p></div><span class="section-no">5</span></div>
+    <div class="path">Menu esquerdo <span class="arrow">›</span> <b>Procedimentos</b> <span class="arrow">›</span> <b>Criar</b></div>
+    <div class="shot-wrap"><img class="shot" src="assets/06-procedimentos.png" alt="Cadastro de procedimento"><span class="caption">Formulário “Criar Procedimento”</span></div>
+    <table>
+      <tr><th>Campo</th><th>Como preencher</th><th>Efeito na agenda</th></tr>
+      <tr><td class="required">Nome</td><td>Nome claro para o paciente, como “Avaliação odontológica”.</td><td>Aparece na lista do bot e na agenda.</td></tr>
+      <tr><td class="required">Duração</td><td>Tempo total em minutos. Mínimo: 5.</td><td>Reserva esse período e evita choque com outra consulta.</td></tr>
+      <tr><td>Valor</td><td>Digite apenas o número; use centavos se necessário.</td><td>Quando vazio, a lista mostra “Sob consulta”.</td></tr>
+      <tr><td>Descrição</td><td>Resumo interno do atendimento.</td><td>Ajuda a equipe a diferenciar serviços parecidos.</td></tr>
+      <tr><td>Dentistas</td><td>Marque quem realiza o procedimento.</td><td>Define os profissionais oferecidos pelo bot.</td></tr>
+      <tr><td>Ativo</td><td>Deixe ligado enquanto o serviço puder ser marcado.</td><td>Desligado, some das novas opções do bot.</td></tr>
+    </table>
+    <div class="warning"><strong>Exemplo:</strong> se uma limpeza dura 45 minutos, informe <strong>45</strong>. O sistema só mostrará horários em que os 45 minutos inteiros cabem no expediente.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Disponibilidade semanal</div><h2>Horários de trabalho</h2><p class="lead">Cadastre os períodos fixos em que cada dentista atende. Use mais de uma linha para separar manhã e tarde.</p></div><span class="section-no">6</span></div>
+    <div class="path">Menu esquerdo <span class="arrow">›</span> <b>Horários de trabalho</b> <span class="arrow">›</span> <b>Criar</b></div>
+    <div class="shot-wrap"><img class="shot" src="assets/07-horarios.png" alt="Cadastro de horário de trabalho"><span class="caption">Formulário “Criar Horário de Trabalho”</span></div>
+    <table>
+      <tr><th>Campo</th><th>Como preencher</th></tr>
+      <tr><td class="required">Dentista</td><td>Escolha o profissional deste expediente.</td></tr>
+      <tr><td class="required">Dia</td><td>Selecione o dia da semana, de segunda a domingo.</td></tr>
+      <tr><td class="required">Início</td><td>Hora em que o primeiro atendimento pode começar.</td></tr>
+      <tr><td class="required">Fim</td><td>Hora em que o período termina. O procedimento precisa acabar até esse horário.</td></tr>
+      <tr><td class="required">Intervalo</td><td>De quantos em quantos minutos o sistema cria uma opção de início. Ex.: 30 min gera 08:00, 08:30, 09:00…</td></tr>
+      <tr><td>Ativo</td><td>Ligado inclui esse período na agenda; desligado o mantém cadastrado, mas indisponível.</td></tr>
+    </table>
+    <div class="grid-2" style="margin-top:4mm">
+      <div class="card soft"><h3>Exemplo: expediente com almoço</h3><p>Crie <strong>segunda, 08:00–12:00</strong> e depois outra linha <strong>segunda, 14:00–18:00</strong>. Repita nos demais dias.</p></div>
+      <div class="card"><h3>Intervalo ≠ duração</h3><p><strong>Intervalo</strong> define os possíveis inícios. <strong>Duração</strong> vem do procedimento e define quanto tempo será ocupado.</p></div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Folgas e exceções</div><h2>Bloqueios da agenda</h2><p class="lead">Use bloqueios para férias, almoço fora do padrão, reunião, manutenção ou qualquer período sem atendimento.</p></div><span class="section-no">7</span></div>
+    <div class="path">Menu esquerdo <span class="arrow">›</span> <b>Bloqueios da agenda</b> <span class="arrow">›</span> <b>Criar</b></div>
+    <div class="shot-wrap"><img class="shot" src="assets/08-bloqueios.png" alt="Cadastro de bloqueio"><span class="caption">Formulário “Criar Bloqueio”</span></div>
+    <table>
+      <tr><th>Campo</th><th>Como preencher</th></tr>
+      <tr><td class="required">Dentista</td><td>Selecione quem ficará indisponível.</td></tr>
+      <tr><td class="required">Início</td><td>Data e hora exatas em que começa a indisponibilidade.</td></tr>
+      <tr><td class="required">Fim</td><td>Data e hora exatas em que termina. Deve ser posterior ao início.</td></tr>
+      <tr><td>Motivo</td><td>Descrição curta para a equipe, como “Férias”, “Reunião” ou “Manutenção”.</td></tr>
+    </table>
+    <div class="steps" style="margin-top:6mm">
+      <div class="step"><b>1</b><div><h3>Bloqueie assim que souber</h3><p>O período deixa de aparecer como livre para novos agendamentos.</p></div></div>
+      <div class="step"><b>2</b><div><h3>Confira consultas já marcadas</h3><p>O bloqueio não substitui o contato com pacientes que já estejam na agenda daquele período.</p></div></div>
+      <div class="step"><b>3</b><div><h3>Edite ou apague quando necessário</h3><p>Abra o bloqueio na lista para ajustar datas ou liberar novamente o horário.</p></div></div>
+    </div>
+    <div class="warning"><strong>Evite bloquear o expediente semanal inteiro.</strong> Para mudanças permanentes, edite “Horários de trabalho”. Use bloqueio para exceções com começo e fim definidos.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Atendimento pela recepção</div><h2>Criar uma consulta</h2><p class="lead">Antes de agendar, confirme que o paciente já está cadastrado.</p></div><span class="section-no">8</span></div>
+    <div class="path">Menu esquerdo <span class="arrow">›</span> <b>Agenda</b> <span class="arrow">›</span> <b>Nova consulta</b></div>
+    <div class="shot-wrap"><img class="shot tall" src="assets/03-nova-consulta.png" alt="Formulário de nova consulta"><span class="caption">Formulário “Criar Consulta”</span></div>
+    <table>
+      <tr><th>Campo</th><th>Como preencher</th></tr>
+      <tr><td class="required">Paciente</td><td>Pesquise pelo nome ou WhatsApp e selecione o cadastro correto.</td></tr>
+      <tr><td class="required">Dentista</td><td>Escolha um profissional ativo.</td></tr>
+      <tr><td class="required">Procedimento</td><td>Escolha um serviço ativo e realizado pelo dentista selecionado.</td></tr>
+      <tr><td class="required">Data e horário</td><td>Informe o início da consulta. O sistema verifica expediente, duração, bloqueios e conflitos.</td></tr>
+      <tr><td class="required">Status</td><td>Normalmente deixe <strong>Agendada</strong>. Use outro estado somente se representar a situação real.</td></tr>
+      <tr><td>Observações</td><td>Recado administrativo breve para a equipe.</td></tr>
+    </table>
+    <div class="success"><strong>Segurança da agenda:</strong> mesmo no painel, o horário é revalidado ao salvar. Se não estiver disponível, corrija a data ou a configuração indicada.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Rotina da recepção</div><h2>Acompanhar a agenda</h2></div><span class="section-no">9</span></div>
+    <div class="path">Menu esquerdo <span class="arrow">›</span> <b>Agenda</b></div>
+    <div class="shot-wrap"><img class="shot" src="assets/02-agenda.png" alt="Lista da agenda"><span class="caption">Lista de consultas e filtros</span></div>
+    <div class="grid-2">
+      <div>
+        <h3>Filtros e pesquisa</h3>
+        <ul><li>O filtro <strong>Hoje</strong> vem ativado para focar no dia atual.</li><li>Use <strong>Dentista</strong> para ver uma agenda específica.</li><li>Use <strong>Status</strong> para localizar confirmadas, faltas ou canceladas.</li><li>A caixa de pesquisa ajuda a encontrar pelo paciente.</li><li><strong>Origem</strong> mostra se veio do WhatsApp ou do Painel.</li></ul>
+      </div>
+      <div>
+        <h3>Ações disponíveis</h3>
+        <ul><li><strong>Editar:</strong> corrige dados ou muda a consulta.</li><li><strong>Confirmar:</strong> registra a confirmação do paciente.</li><li><strong>Iniciar:</strong> marca que o atendimento começou.</li><li><strong>Concluir:</strong> encerra um atendimento em andamento.</li><li><strong>Cancelar / Marcar falta:</strong> exigem confirmação para evitar clique acidental.</li></ul>
+      </div>
+    </div>
+    <h3 style="margin-top:3mm">Significado dos status</h3>
+    <div class="status-row">
+      <div class="status"><b>Agendada</b>Aguardando confirmação ou data.</div>
+      <div class="status green"><b>Confirmada</b>Paciente confirmou presença.</div>
+      <div class="status yellow"><b>Em atendimento</b>Consulta já começou.</div>
+      <div class="status blue"><b>Concluída</b>Atendimento finalizado.</div>
+      <div class="status red"><b>Cancelada</b>Consulta cancelada; fica no histórico.</div>
+      <div class="status red"><b>Paciente faltou</b>Não compareceu ao atendimento.</div>
+    </div>
+    <div class="tip"><strong>Rotina sugerida:</strong> pela manhã, abra o Painel de Controle; depois use Agenda com o filtro Hoje. Atualize os status ao longo do atendimento para manter os indicadores corretos.</div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Atendimento automático</div><h2>Como o paciente inicia o bot</h2><p class="lead">O paciente só precisa mandar uma mensagem de texto para o WhatsApp conectado à clínica.</p></div><span class="section-no">10</span></div>
+    <div class="grid-2" style="grid-template-columns: 1.05fr .95fr; align-items:start">
+      <div>
+        <div class="phone">
+          <div class="phone-head">Clínica Sorriso e Vida 🦷</div>
+          <div class="bubble me">Oi <span class="chat-time">09:14</span></div>
+          <div class="bubble">Olá! Bem-vindo(a) à <b>Clínica Sorriso e Vida</b> 😁<br><br>1. Agendar consulta<br>2. Minhas consultas<br>3. Cancelar consulta<br>4. Reagendar consulta<br><br>Responda com o número da opção. <span class="chat-time">09:14</span></div>
+        </div>
+      </div>
+      <div>
+        <h3>Mensagens que abrem o menu</h3>
+        <div class="card soft"><p><span class="badge">menu</span> <span class="badge">oi</span> <span class="badge">olá</span> <span class="badge">início</span> <span class="badge">iniciar</span></p><p>Qualquer uma delas reinicia a conversa e mostra as quatro opções.</p></div>
+        <h3 style="margin-top:5mm">Regras simples</h3>
+        <ul><li>Responda com o <strong>número</strong> mostrado na lista.</li><li>Datas devem estar no formato <strong>DD/MM/AAAA</strong>.</li><li>Na confirmação, responda <strong>sim</strong> ou <strong>não</strong>.</li><li>O bot entende somente <strong>texto</strong>; áudio, foto e figurinha não são processados.</li></ul>
+        <div class="warning"><strong>Conversa parada:</strong> após o tempo de inatividade configurado (normalmente 30 minutos), digite <strong>menu</strong> para recomeçar.</div>
+      </div>
+    </div>
+    <div class="rule"></div>
+    <h3>Comandos rápidos em qualquer etapa</h3>
+    <table><tr><th>Mensagem</th><th>O que acontece</th></tr><tr><td>ajuda</td><td>Mostra uma explicação curta dos comandos.</td></tr><tr><td>status / consultas / minhas consultas</td><td>Lista as próximas consultas agendadas ou confirmadas.</td></tr><tr><td>confirmar</td><td>Confirma a próxima consulta futura do paciente.</td></tr><tr><td>sair / parar / cancelar</td><td>Encerra o fluxo atual. Para voltar, basta digitar “menu”.</td></tr></table>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">WhatsApp • opção 1</div><h2>Agendar pelo bot</h2></div><span class="section-no">11</span></div>
+    <div class="grid-2" style="grid-template-columns:.88fr 1.12fr; align-items:start">
+      <div class="phone" style="width:76mm">
+        <div class="phone-head">Assistente virtual</div>
+        <div class="bubble me">1 <span class="chat-time">09:15</span></div>
+        <div class="bubble">Antes de agendar, qual é o seu nome completo?</div>
+        <div class="bubble me">Maria da Silva</div>
+        <div class="bubble">Qual atendimento você deseja?<br><br>1. Avaliação odontológica — 30 min<br>2. Limpeza — 45 min</div>
+        <div class="bubble me">2</div>
+        <div class="bubble">Escolha o profissional:<br><br>1. Dra. Ana Sorriso — Clínica geral</div>
+        <div class="bubble me">1</div>
+        <div class="bubble">Qual data você prefere? Digite no formato <b>DD/MM/AAAA</b>.</div>
+      </div>
+      <div>
+        <div class="steps">
+          <div class="step"><b>1</b><div><h3>Escolher “Agendar consulta”</h3><p>O paciente envia <strong>1</strong>. Se for o primeiro contato, o bot pede o nome completo.</p></div></div>
+          <div class="step"><b>2</b><div><h3>Escolher o procedimento</h3><p>O bot lista apenas procedimentos ativos, junto com a duração.</p></div></div>
+          <div class="step"><b>3</b><div><h3>Escolher o profissional</h3><p>Aparecem somente dentistas ativos e vinculados ao procedimento.</p></div></div>
+          <div class="step"><b>4</b><div><h3>Informar a data</h3><p>Digite, por exemplo, <strong>15/10/2026</strong>. A data precisa estar dentro do período permitido.</p></div></div>
+          <div class="step"><b>5</b><div><h3>Escolher o horário</h3><p>O bot mostra somente horários livres. Responda com o número, não com a hora digitada.</p></div></div>
+          <div class="step"><b>6</b><div><h3>Conferir e confirmar</h3><p>Revise procedimento, profissional, data e hora. Envie <strong>sim</strong> para gravar.</p></div></div>
+        </div>
+        <div class="success"><strong>Pronto:</strong> o bot responde “Consulta agendada com sucesso” e a nova consulta aparece no painel com origem <strong>WhatsApp</strong>.</div>
+        <div class="warning"><strong>Se não houver horário:</strong> envie outra data no mesmo formato. Para abandonar o processo, digite <strong>sair</strong>.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">WhatsApp • opções 2, 3 e 4</div><h2>Consultar, cancelar e reagendar</h2></div><span class="section-no">12</span></div>
+    <div class="grid-3">
+      <div class="card soft"><div class="icon">2</div><h3>Minhas consultas</h3><p>Mostra as consultas futuras que estejam <strong>Agendadas</strong> ou <strong>Confirmadas</strong>, em ordem de data.</p><p class="small">Também funciona digitando “status” ou “consultas”.</p></div>
+      <div class="card soft"><div class="icon">3</div><h3>Cancelar consulta</h3><p>O paciente escolhe uma consulta da lista e responde <strong>sim</strong> para confirmar o cancelamento.</p><p class="small">A consulta fica no histórico como Cancelada.</p></div>
+      <div class="card soft"><div class="icon">4</div><h3>Reagendar consulta</h3><p>O paciente escolhe a consulta, informa nova data, seleciona um horário livre e confirma.</p><p class="small">Mantém profissional e procedimento da consulta original.</p></div>
+    </div>
+    <div class="rule"></div>
+    <div class="grid-2" style="align-items:start">
+      <div class="phone" style="width:78mm">
+        <div class="phone-head">Exemplo: cancelamento</div>
+        <div class="bubble me">menu</div>
+        <div class="bubble">1. Agendar consulta<br>2. Minhas consultas<br>3. Cancelar consulta<br>4. Reagendar consulta</div>
+        <div class="bubble me">3</div>
+        <div class="bubble">Qual consulta deseja cancelar?<br><br>1. 15/10/2026 às 09:00 — Limpeza com Dra. Ana</div>
+        <div class="bubble me">1</div>
+        <div class="bubble">Confirma o cancelamento? Responda <b>sim</b> ou <b>não</b>.</div>
+        <div class="bubble me">sim</div>
+        <div class="bubble">Consulta cancelada. Se quiser escolher outra data, digite <b>menu</b>.</div>
+      </div>
+      <div>
+        <h3>Cuidados importantes</h3>
+        <ul><li>O número do WhatsApp identifica o paciente. Se o contato mudar, a recepção deve atualizar o cadastro.</li><li>Somente consultas futuras agendadas ou confirmadas aparecem nessas opções.</li><li>Uma consulta já concluída, cancelada, em atendimento ou marcada como falta não pode ser cancelada/reagendada pelo bot.</li><li>Antes de responder <strong>sim</strong>, o paciente deve conferir a consulta escolhida.</li></ul>
+        <div class="tip"><strong>Confirmação rápida:</strong> a mensagem <strong>confirmar</strong> confirma a próxima consulta futura, sem passar pelo menu.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Automação e segurança</div><h2>Lembretes e regras da agenda</h2></div><span class="section-no">13</span></div>
+    <div class="grid-2">
+      <div class="card dark"><span class="badge" style="background:#33545a;color:#bff4ec">Até 24 horas</span><h3 style="margin-top:3mm">Lembrete antecipado</h3><p>Informa data, horário, procedimento e dentista. Orienta o paciente a responder <strong style="color:#66e1d2">confirmar</strong> ou digitar <strong style="color:#66e1d2">menu</strong> para alterar.</p></div>
+      <div class="card dark"><span class="badge" style="background:#33545a;color:#bff4ec">Até 2 horas</span><h3 style="margin-top:3mm">Lembrete próximo</h3><p>Reforça os dados da consulta e orienta a usar o menu se for necessário alterar.</p></div>
+    </div>
+    <h3 style="margin-top:7mm">O que o sistema verifica antes de aceitar um horário</h3>
+    <div class="steps">
+      <div class="step"><b>1</b><div><h3>Profissional e procedimento ativos</h3><p>O dentista precisa realizar o procedimento selecionado.</p></div></div>
+      <div class="step"><b>2</b><div><h3>Dentro do expediente</h3><p>O atendimento inteiro precisa caber em um horário de trabalho ativo.</p></div></div>
+      <div class="step"><b>3</b><div><h3>Sem bloqueio</h3><p>Férias, reuniões e outros bloqueios retiram o período da lista.</p></div></div>
+      <div class="step"><b>4</b><div><h3>Sem conflito</h3><p>Consultas agendadas, confirmadas ou em atendimento ocupam o horário.</p></div></div>
+      <div class="step"><b>5</b><div><h3>Antecedência e limite futuro</h3><p>A configuração padrão permite agendar com pelo menos 2 horas de antecedência e até 90 dias à frente.</p></div></div>
+    </div>
+    <div class="warning"><strong>Esses limites podem ser alterados pelo responsável técnico.</strong> Se a clínica mudar a regra, confirme a configuração antes de orientar o paciente.</div>
+    <h3 style="margin-top:5mm">Quando algo não aparece no bot</h3>
+    <table><tr><th>Sintoma</th><th>O que conferir no painel</th></tr><tr><td>Procedimento não aparece</td><td>Se está ativo.</td></tr><tr><td>Dentista não aparece</td><td>Se está ativo e vinculado ao procedimento.</td></tr><tr><td>Data sem horários</td><td>Horário de trabalho, duração, bloqueios, consultas existentes e antecedência mínima.</td></tr><tr><td>Paciente não consegue agendar</td><td>Se o cadastro do paciente está ativo.</td></tr></table>
+  </section>
+
+  <section class="page">
+    <div class="header"><div><div class="eyebrow">Validação antes de liberar</div><h2>Roteiro de teste completo</h2><p class="lead">Faça este teste com um número autorizado e uma data futura livre. Marque cada item somente depois de conferir no painel.</p></div><span class="section-no">14</span></div>
+    <div class="checklist">
+      <div class="check"><span class="box"></span><p><strong>1. Login:</strong> entre no painel com e-mail e senha administrativos.</p></div>
+      <div class="check"><span class="box"></span><p><strong>2. Dentista:</strong> confirme nome, CRO, status Ativo e procedimento vinculado.</p></div>
+      <div class="check"><span class="box"></span><p><strong>3. Procedimento:</strong> confirme duração, status Ativo e dentista selecionado.</p></div>
+      <div class="check"><span class="box"></span><p><strong>4. Horário:</strong> crie um período de trabalho no dia que será usado no teste.</p></div>
+      <div class="check"><span class="box"></span><p><strong>5. Bot:</strong> envie <strong>menu</strong> no WhatsApp e confira as quatro opções.</p></div>
+      <div class="check"><span class="box"></span><p><strong>6. Agendamento:</strong> escolha 1, informe nome (se solicitado), procedimento, dentista, data e horário; responda <strong>sim</strong>.</p></div>
+      <div class="check"><span class="box"></span><p><strong>7. Painel:</strong> abra Agenda, retire/ajuste o filtro Hoje se necessário e confirme que a consulta aparece com origem WhatsApp.</p></div>
+      <div class="check"><span class="box"></span><p><strong>8. Status:</strong> envie <strong>status</strong> e confira se os mesmos dados aparecem no WhatsApp.</p></div>
+      <div class="check"><span class="box"></span><p><strong>9. Confirmação:</strong> envie <strong>confirmar</strong> e confira o status Confirmada no painel.</p></div>
+      <div class="check"><span class="box"></span><p><strong>10. Reagendamento:</strong> use opção 4, escolha nova data e horário e confirme a mudança no painel.</p></div>
+      <div class="check"><span class="box"></span><p><strong>11. Cancelamento:</strong> use opção 3 e confira se a consulta fica Cancelada no histórico.</p></div>
+      <div class="check"><span class="box"></span><p><strong>12. Bloqueio:</strong> crie um bloqueio de teste e confirme que aquele período não é oferecido.</p></div>
+    </div>
+    <div class="grid-2" style="margin-top:5mm">
+      <div class="card soft"><h3>Resultado esperado</h3><p>Bot e painel mostram os mesmos dados, não existe sobreposição e os estados mudam corretamente.</p></div>
+      <div class="card"><h3>Se falhar</h3><p>Anote o horário, o número usado, a mensagem recebida e tire uma captura da tela. Isso acelera o diagnóstico técnico.</p></div>
+    </div>
+  </section>
+
+  <section class="page final">
+    <div class="header"><div><div class="eyebrow" style="color:#66e1d2">Guarde esta página</div><h2>Consulta rápida</h2></div><span class="section-no" style="background:#66e1d2;color:#12343a">15</span></div>
+    <div class="grid-2">
+      <div class="card"><h3>Recepção</h3><p><strong>Novo paciente:</strong><br>Pacientes › Criar</p><p><strong>Nova consulta:</strong><br>Agenda › Nova consulta</p><p><strong>Folga ou férias:</strong><br>Bloqueios da agenda › Criar</p><p><strong>Mudar expediente:</strong><br>Horários de trabalho › Editar</p></div>
+      <div class="card"><h3>Paciente no WhatsApp</h3><p><strong>Abrir menu:</strong> menu</p><p><strong>Ver próximas:</strong> status</p><p><strong>Confirmar a próxima:</strong> confirmar</p><p><strong>Interromper:</strong> sair</p><p><strong>Orientação:</strong> ajuda</p></div>
+    </div>
+    <div class="rule" style="background:#35545a;margin:8mm 0"></div>
+    <h3>Antes de dizer “não há horário”</h3>
+    <div class="grid-3">
+      <div class="card"><span class="badge">01</span><p style="margin-top:3mm">Dentista e procedimento estão ativos e vinculados?</p></div>
+      <div class="card"><span class="badge">02</span><p style="margin-top:3mm">Existe horário de trabalho naquele dia?</p></div>
+      <div class="card"><span class="badge">03</span><p style="margin-top:3mm">A duração cabe antes do fim do expediente?</p></div>
+      <div class="card"><span class="badge">04</span><p style="margin-top:3mm">Há bloqueio ou outra consulta no período?</p></div>
+      <div class="card"><span class="badge">05</span><p style="margin-top:3mm">A data respeita antecedência e limite futuro?</p></div>
+      <div class="card"><span class="badge">06</span><p style="margin-top:3mm">O paciente está com o cadastro ativo?</p></div>
+    </div>
+    <div style="margin-top:14mm;max-width:145mm">
+      <div class="tooth" style="margin-bottom:5mm">🦷</div>
+      <h2 style="font-size:26pt">Pronto para testar.</h2>
+      <p style="font-size:11pt">Comece pela página 15, siga o roteiro completo e use esta folha como apoio no dia a dia.</p>
+      <p class="small" style="margin-top:8mm">Clínica Sorriso e Vida • Painel de agendamentos e bot no WhatsApp • Manual versão 1.0</p>
+    </div>
+  </section>
+
+</body>
+</html>

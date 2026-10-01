@@ -6,9 +6,26 @@
 # Uso: docker compose -f docker-compose.yml -f docker-compose.local.yml -f docker-compose.production.yml up -d --build
 # ============================================================
 services:
+  # Código e dependências ficam dentro da imagem. Sem bind mount, o vendor
+  # construído no Dockerfile não é ocultado e não há conflito de UID/GID.
+  app:
+    volumes: !reset []
+
+  queue:
+    volumes: !reset []
+
+  scheduler:
+    volumes: !reset []
+
   nginx:
     container_name: clinica-sorriso-e-vida-nginx
+    image: clinica-sorriso-e-vida-nginx:latest
+    build:
+      context: .
+      dockerfile: .docker/php/Dockerfile
+      target: nginx-prod
     ports: !reset []
+    volumes: !reset []
     networks:
       - clinica-sorriso-e-vida
       - proxy_network

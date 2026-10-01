@@ -1,6 +1,7 @@
 # ============================================================
 # Clínica Sorriso e Vida — comandos do dia a dia
 #
+#   make install  instala/atualiza tudo conforme APP_ENV e portas do .env
 #   make up       sobe o ambiente (local inclui postgres + evolution)
 #   make down     derruba tudo
 #   make build    atualiza SÓ o back (app/queue/scheduler) sem derrubar o resto
@@ -13,7 +14,7 @@ APP_ENV := $(shell grep -E '^APP_ENV=' .env 2>/dev/null | cut -d= -f2)
 ifeq ($(APP_ENV),local)
 COMPOSE := docker compose -f docker-compose.yml -f docker-compose.local.yml
 else
-COMPOSE := docker compose -f docker-compose.yml
+COMPOSE := docker compose -f docker-compose.yml -f docker-compose.local.yml -f docker-compose.production.yml
 endif
 
 # Serviços PHP — os únicos recriados no make build
@@ -21,11 +22,18 @@ BACK_SERVICES := app queue scheduler
 
 .DEFAULT_GOAL := help
 
-.PHONY: help up down build restart ps logs shell tinker composer artisan \
-        migrate fresh seed test pint assets
+.PHONY: help install up down build restart ps logs shell tinker \
+        composer artisan migrate fresh seed test pint assets
 
 help: ## Lista os comandos disponíveis
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
+
+install: ## Instala tudo: containers, dependências, APP_KEY, banco, seed e assets
+	@if [ "$(APP_ENV)" = "local" ]; then \
+		./bin/setup-local; \
+	else \
+		./bin/deploy-homolog; \
+	fi
 
 up: ## Sobe o ambiente completo
 	$(COMPOSE) up -d
@@ -70,7 +78,7 @@ seed: ## Roda os seeders
 	$(COMPOSE) exec app php artisan db:seed
 
 test: ## Roda a suíte de testes (Pest)
-	$(COMPOSE) exec app php artisan test
+	$(COMPOSE) exec -e APP_ENV=testing -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: -e DB_URL= -e CACHE_STORE=array -e SESSION_DRIVER=array -e QUEUE_CONNECTION=sync app php artisan test
 
 pint: ## Formata o código (Laravel Pint)
 	$(COMPOSE) exec app vendor/bin/pint

@@ -81,3 +81,12 @@ RUN composer dump-autoload --optimize --no-dev \
     && chown -R www-data:www-data storage bootstrap/cache
 
 USER www-data
+
+# ============================================================
+# Nginx de produção: recebe os mesmos arquivos públicos gerados
+# na imagem PHP. Assim o servidor não depende de bind mounts.
+# ============================================================
+FROM nginx:1.29-alpine AS nginx-prod
+
+COPY .docker/nginx/conf.d /etc/nginx/conf.d
+COPY --from=prod /var/www/html/public /var/www/html/public
