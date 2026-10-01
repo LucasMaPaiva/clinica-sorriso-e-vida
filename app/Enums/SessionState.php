@@ -15,4 +15,6 @@ enum SessionState: string
     case AwaitingAppointmentToCancel = 'awaiting_appointment_to_cancel';
     case AwaitingCancellationConfirmation = 'awaiting_cancellation_confirmation';
     case AwaitingAppointmentToReschedule = 'awaiting_appointment_to_reschedule';
+    case AwaitingAnythingElse = 'awaiting_anything_else';
+    case HumanHandoff = 'human_handoff';
 }

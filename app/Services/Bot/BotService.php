@@ -29,17 +29,42 @@ class BotService
         if ($session->patient_id !== $patient->id) {
             $session->update(['patient_id' => $patient->id]);
         }
+
+        $text = trim((string) $text);
+        $normalized = $this->normalize($text);
+
+        if ($this->wantsHuman($normalized)) {
+            return [$this->requestHumanHandoff($session, $text)];
+        }
+
+        if ($session->state === SessionState::HumanHandoff) {
+            if ($this->wantsBot($normalized)) {
+                $this->reset($session);
+                $this->touch($session);
+
+                return ['Tudo certo, o atendimento automático voltou 😊', ...$this->welcome($session)];
+            }
+
+            $this->rememberHandoffMessage($session, $text);
+
+            // Enquanto uma pessoa atende, o bot não disputa a conversa.
+            return [];
+        }
+
+        if ($this->looksUrgent($normalized)) {
+            return [$this->requestUrgentHandoff($session, $text)];
+        }
+
         if ($hasNonTextMessage) {
             $this->touch($session);
 
-            return ['No momento eu entendo apenas mensagens de texto. Digite *menu* para começar 🙂'];
+            return ['Recebi sua mensagem 😊 Por enquanto consigo atender apenas por texto. Você pode escrever sua dúvida ou digitar *atendente* para falar com a recepção.'];
         }
 
-        $text = trim((string) $text);
         if ($text === '') {
             return [];
         }
-        $normalized = Str::of($text)->ascii()->lower()->squish()->value();
+
         if ($session->isExpired(config('clinic.session_timeout_minutes'))) {
             $this->reset($session);
         }
@@ -50,17 +75,19 @@ class BotService
         }
 
         $replies = match ($session->state) {
-            SessionState::Idle => $this->welcome($session),
+            SessionState::Idle => $this->handleFirstMessage($session, $patient, $normalized),
             SessionState::AwaitingAction => $this->handleAction($session, $patient, $normalized),
             SessionState::AwaitingName => $this->handleName($session, $patient, $text),
             SessionState::AwaitingProcedure => $this->handleProcedure($session, $normalized),
             SessionState::AwaitingDentist => $this->handleDentist($session, $normalized),
             SessionState::AwaitingDate => $this->handleDate($session, $text),
-            SessionState::AwaitingTime => $this->handleTime($session, $normalized),
+            SessionState::AwaitingTime => $this->handleTime($session, $text),
             SessionState::AwaitingConfirmation => $this->handleBookingConfirmation($session, $patient, $normalized),
             SessionState::AwaitingAppointmentToCancel => $this->handleAppointmentToCancel($session, $patient, $normalized),
             SessionState::AwaitingCancellationConfirmation => $this->handleCancellationConfirmation($session, $patient, $normalized),
             SessionState::AwaitingAppointmentToReschedule => $this->handleAppointmentToReschedule($session, $patient, $normalized),
+            SessionState::AwaitingAnythingElse => $this->handleAnythingElse($session, $normalized),
+            SessionState::HumanHandoff => [],
         };
         $this->touch($session);
 
@@ -69,7 +96,7 @@ class BotService
 
     protected function globalCommand(WhatsappSession $session, Patient $patient, string $text): ?array
     {
-        if (in_array($text, ['menu', 'inicio', 'iniciar', 'oi', 'ola'], true)) {
+        if (in_array($text, ['menu', 'inicio', 'iniciar', 'recomecar', 'comecar de novo'], true) || $this->isGreeting($text)) {
             $this->reset($session);
 
             return $this->welcome($session);
@@ -88,11 +115,12 @@ class BotService
                 return ['Você não possui consulta futura para confirmar.'];
             }
             $this->appointments->confirm($appointment);
+            $this->awaitAnythingElse($session);
 
-            return ['Consulta confirmada ✅ '.$this->appointmentLine($appointment->fresh())];
+            return ['Consulta confirmada ✅ '.$this->appointmentLine($appointment->fresh())."\n\nPosso ajudar com mais alguma coisa?\n\n*1* — Sim, voltar ao menu\n*2* — Não, encerrar atendimento"];
         }
         if ($text === 'ajuda') {
-            return ['Sou a assistente virtual da '.config('clinic.name').".\n\nDigite *menu* para agendar, consultar, cancelar ou reagendar.\nDigite *confirmar* para confirmar sua próxima consulta.\nDigite *sair* para abandonar o fluxo atual."];
+            return ['Sou a assistente virtual da '.config('clinic.name').".\n\nDigite *menu* para agendar, consultar, cancelar ou reagendar.\nDigite *confirmar* para confirmar sua próxima consulta.\nDigite *atendente* para falar com a recepção.\nDigite *sair* para abandonar o fluxo atual."];
         }
 
         return null;
@@ -102,18 +130,29 @@ class BotService
     {
         $session->update(['state' => SessionState::AwaitingAction, 'context' => []]);
 
-        return ['Olá! Bem-vindo(a) à *'.config('clinic.name')."* 😁\n\n1. Agendar consulta\n2. Minhas consultas\n3. Cancelar consulta\n4. Reagendar consulta\n\nResponda com o número da opção."];
+        return ['Olá! Que bom ter você por aqui 😊\nEu sou a assistente virtual da *'.config('clinic.name')."*.\n\nComo posso ajudar?\n\n*1* — Agendar consulta\n*2* — Minhas consultas\n*3* — Cancelar consulta\n*4* — Reagendar consulta\n\nPode responder com o número ou escrever do seu jeito. Se preferir, digite *atendente* para falar com a recepção."];
     }
 
     protected function handleAction(WhatsappSession $session, Patient $patient, string $text): array
     {
-        return match ($text) {
-            '1', 'agendar' => $this->beginBooking($session, $patient),
-            '2', 'minhas consultas', 'consultas' => [$this->appointmentsMessage($patient), ...$this->welcome($session)],
-            '3', 'cancelar consulta' => $this->beginCancellation($session, $patient),
-            '4', 'reagendar', 'reagendar consulta' => $this->beginReschedule($session, $patient),
-            default => ['Opção inválida. Responda com *1*, *2*, *3* ou *4*.'],
+        return match ($this->actionIntent($text)) {
+            'book' => $this->beginBooking($session, $patient),
+            'list' => [$this->appointmentsMessage($patient), ...$this->welcome($session)],
+            'cancel' => $this->beginCancellation($session, $patient),
+            'reschedule' => $this->beginReschedule($session, $patient),
+            default => ["Não entendi bem o que você precisa. Você pode responder com *1*, *2*, *3* ou *4*, ou escrever algo como *quero agendar*.\n\nSe preferir falar com uma pessoa, digite *atendente*."],
         };
+    }
+
+    protected function handleFirstMessage(WhatsappSession $session, Patient $patient, string $text): array
+    {
+        $welcome = $this->welcome($session);
+
+        if ($this->actionIntent($text) === null) {
+            return $welcome;
+        }
+
+        return [$welcome[0], ...$this->handleAction($session, $patient, $text)];
     }
 
     protected function beginBooking(WhatsappSession $session, Patient $patient): array
@@ -124,10 +163,10 @@ class BotService
         if (blank($patient->name)) {
             $session->update(['state' => SessionState::AwaitingName, 'context' => []]);
 
-            return ['Antes de agendar, qual é o seu nome completo?'];
+            return ['Claro, vamos encontrar um horário para você 😊 Antes de começar, qual é o seu nome completo?'];
         }
 
-        return $this->askProcedure($session);
+        return ["Claro, {$patient->name}! Vamos encontrar um horário para você 😊", ...$this->askProcedure($session)];
     }
 
     protected function handleName(WhatsappSession $session, Patient $patient, string $text): array
@@ -137,7 +176,7 @@ class BotService
         }
         $patient->update(['name' => Str::of($text)->squish()->title()->value()]);
 
-        return $this->askProcedure($session);
+        return ["Prazer, {$patient->fresh()->name}!", ...$this->askProcedure($session)];
     }
 
     protected function askProcedure(WhatsappSession $session): array
@@ -150,14 +189,14 @@ class BotService
         }
         $session->update(['state' => SessionState::AwaitingProcedure, 'context' => ['procedure_ids' => $procedures->modelKeys()]]);
 
-        return ["Qual atendimento você deseja?\n\n".$this->numbered($procedures, fn (Procedure $p) => $p->name.' — '.$p->duration_minutes.' min')];
+        return ["Qual atendimento você deseja?\n\n".$this->numbered($procedures, fn (Procedure $p) => $p->name.' — '.$p->duration_minutes.' min')."\n\nPode mandar o número ou o nome do procedimento."];
     }
 
     protected function handleProcedure(WhatsappSession $session, string $text): array
     {
         $procedure = $this->selectedModel(Procedure::class, $session->context['procedure_ids'] ?? [], $text);
         if (! $procedure) {
-            return ['Escolha o procedimento pelo número exibido na lista.'];
+            return ['Não consegui identificar o procedimento. Envie o número ou o nome de uma das opções mostradas. Se tiver dúvida, digite *atendente*.'];
         }
         $dentists = $procedure->dentists()->where('active', true)->orderBy('name')->get();
         if ($dentists->isEmpty()) {
@@ -165,28 +204,28 @@ class BotService
         }
         $session->update(['state' => SessionState::AwaitingDentist, 'context' => ['procedure_id' => $procedure->id, 'dentist_ids' => $dentists->modelKeys()]]);
 
-        return ["Escolha o profissional:\n\n".$this->numbered($dentists, fn (Dentist $d) => $d->name.($d->specialty ? ' — '.$d->specialty : ''))];
+        return ["Certo! Com qual profissional você prefere agendar?\n\n".$this->numbered($dentists, fn (Dentist $d) => $d->name.($d->specialty ? ' — '.$d->specialty : ''))."\n\nPode mandar o número ou o nome do profissional."];
     }
 
     protected function handleDentist(WhatsappSession $session, string $text): array
     {
         $dentist = $this->selectedModel(Dentist::class, $session->context['dentist_ids'] ?? [], $text);
         if (! $dentist) {
-            return ['Escolha o profissional pelo número exibido na lista.'];
+            return ['Não consegui identificar o profissional. Envie o número ou o nome de uma das opções mostradas.'];
         }
         $context = $session->context;
         $context['dentist_id'] = $dentist->id;
         unset($context['dentist_ids']);
         $session->update(['state' => SessionState::AwaitingDate, 'context' => $context]);
 
-        return ['Qual data você prefere? Digite no formato *DD/MM/AAAA*.'];
+        return ['Ótimo! Qual data você prefere? Pode escrever *amanhã* ou usar o formato *DD/MM/AAAA*.'];
     }
 
     protected function handleDate(WhatsappSession $session, string $text): array
     {
         $date = $this->parseDate($text);
         if (! $date || $date->isBefore(today()) || $date->isAfter(today()->addDays(config('clinic.booking.max_days_ahead')))) {
-            return ['Data inválida. Informe uma data entre hoje e '.today()->addDays(config('clinic.booking.max_days_ahead'))->format('d/m/Y').'.'];
+            return ['Não consegui entender essa data. Escreva *amanhã* ou informe uma data entre hoje e '.today()->addDays(config('clinic.booking.max_days_ahead'))->format('d/m/Y').' no formato *DD/MM/AAAA*.'];
         }
         $dentist = Dentist::query()->find($session->context['dentist_id'] ?? null);
         $procedure = Procedure::query()->find($session->context['procedure_id'] ?? null);
@@ -197,7 +236,7 @@ class BotService
         }
         $slots = $this->appointments->availableSlots($dentist, $procedure, $date);
         if ($slots->isEmpty()) {
-            return ['Não há horários livres nessa data. Envie outra data no formato *DD/MM/AAAA*.'];
+            return ['Poxa, não encontrei horários livres nessa data. Você pode enviar outra data no formato *DD/MM/AAAA* ou digitar *atendente* para falar com a recepção.'];
         }
         $context = $session->context;
         $context['date'] = $date->format('Y-m-d');
@@ -210,9 +249,9 @@ class BotService
     protected function handleTime(WhatsappSession $session, string $text): array
     {
         $slots = collect($session->context['slots'] ?? []);
-        $index = $this->choiceIndex($text, $slots->count());
+        $index = $this->slotIndex($text, $slots);
         if ($index === null) {
-            return ['Escolha o horário pelo número exibido na lista.'];
+            return ['Não consegui identificar o horário. Envie o número mostrado na lista ou escreva o horário, por exemplo *14h* ou *14:30*.'];
         }
         $context = $session->context;
         $context['starts_at'] = $slots[$index];
@@ -224,13 +263,13 @@ class BotService
 
     protected function handleBookingConfirmation(WhatsappSession $session, Patient $patient, string $text): array
     {
-        if (in_array($text, ['nao', 'n'], true)) {
+        if ($this->isNegative($text)) {
             $this->reset($session);
 
             return ['Agendamento descartado. Digite *menu* para escolher outra opção.'];
         }
-        if (! in_array($text, ['sim', 's'], true)) {
-            return ['Responda *sim* para confirmar ou *não* para descartar.'];
+        if (! $this->isAffirmative($text)) {
+            return ['Só para eu não marcar errado: responda *sim* para confirmar ou *não* para descartar.'];
         }
         $context = $session->context;
         try {
@@ -247,9 +286,9 @@ class BotService
 
             return [$e->getMessage().' Envie outra data no formato *DD/MM/AAAA*.'];
         }
-        $this->reset($session);
+        $this->awaitAnythingElse($session);
 
-        return [$message."\n".$this->appointmentLine($appointment)."\n\nQuando precisar, digite *menu*."];
+        return [$message."\n".$this->appointmentLine($appointment)."\n\nPosso ajudar com mais alguma coisa?\n\n*1* — Sim, voltar ao menu\n*2* — Não, encerrar atendimento"];
     }
 
     protected function beginCancellation(WhatsappSession $session, Patient $patient): array
@@ -276,12 +315,12 @@ class BotService
 
     protected function handleCancellationConfirmation(WhatsappSession $session, Patient $patient, string $text): array
     {
-        if (in_array($text, ['nao', 'n'], true)) {
+        if ($this->isNegative($text)) {
             $this->reset($session);
 
             return ['Cancelamento descartado. Digite *menu* para voltar.'];
         }
-        if (! in_array($text, ['sim', 's'], true)) {
+        if (! $this->isAffirmative($text)) {
             return ['Responda *sim* para cancelar ou *não* para manter a consulta.'];
         }
         $appointment = Appointment::query()->where('patient_id', $patient->id)->find($session->context['cancel_appointment_id'] ?? null);
@@ -295,9 +334,9 @@ class BotService
         } catch (DomainException $e) {
             return [$e->getMessage()];
         }
-        $this->reset($session);
+        $this->awaitAnythingElse($session);
 
-        return ['Consulta cancelada. Se quiser escolher outra data, digite *menu*.'];
+        return ["Consulta cancelada com sucesso.\n\nPosso ajudar com mais alguma coisa?\n\n*1* — Sim, voltar ao menu\n*2* — Não, encerrar atendimento"];
     }
 
     protected function beginReschedule(WhatsappSession $session, Patient $patient): array
@@ -320,6 +359,21 @@ class BotService
         $session->update(['state' => SessionState::AwaitingDate, 'context' => ['reschedule_appointment_id' => $appointment->id, 'procedure_id' => $appointment->procedure_id, 'dentist_id' => $appointment->dentist_id]]);
 
         return ['Informe a nova data no formato *DD/MM/AAAA*.'];
+    }
+
+    protected function handleAnythingElse(WhatsappSession $session, string $text): array
+    {
+        if (in_array($text, ['1', 'sim', 's', 'quero', 'preciso'], true)) {
+            return $this->welcome($session);
+        }
+
+        if (in_array($text, ['2', 'nao', 'n', 'encerrar', 'finalizar', 'so isso', 'era so isso'], true)) {
+            $this->reset($session);
+
+            return ['Tudo certo! Atendimento encerrado. Obrigado por falar com a gente e até mais 😊'];
+        }
+
+        return ["Só para eu entender: você precisa de mais alguma coisa?\n\n*1* — Sim, voltar ao menu\n*2* — Não, encerrar atendimento"];
     }
 
     protected function appointmentsMessage(Patient $patient): string
@@ -352,6 +406,20 @@ class BotService
 
     protected function parseDate(string $text): ?CarbonImmutable
     {
+        $normalized = $this->normalize($text);
+
+        if ($normalized === 'hoje' || Str::contains($normalized, ['pode ser hoje', 'para hoje'])) {
+            return CarbonImmutable::today(config('app.timezone'));
+        }
+
+        if ($normalized === 'amanha' || Str::contains($normalized, ['pode ser amanha', 'para amanha'])) {
+            return CarbonImmutable::today(config('app.timezone'))->addDay();
+        }
+
+        if (preg_match('/\b(\d{2}\/\d{2}\/\d{4})\b/', $text, $matches)) {
+            $text = $matches[1];
+        }
+
         try {
             $date = CarbonImmutable::createFromFormat('!d/m/Y', trim($text), config('app.timezone'));
 
@@ -365,16 +433,70 @@ class BotService
     {
         $i = $this->choiceIndex($choice, count($ids));
 
-        return $i === null ? null : $model::query()->find($ids[$i]);
+        if ($i !== null) {
+            return $model::query()->find($ids[$i]);
+        }
+
+        $choice = $this->normalize($choice);
+        $choiceTokens = $this->meaningfulTokens($choice);
+        $matches = collect($ids)->map(function (int|string $id) use ($model, $choice, $choiceTokens) {
+            $record = $model::query()->find($id);
+            if (! $record || blank(data_get($record, 'name'))) {
+                return null;
+            }
+
+            $name = $this->normalize((string) $record->name);
+            $score = ($choice === $name || Str::contains($choice, $name))
+                ? 100
+                : count(array_intersect($choiceTokens, $this->meaningfulTokens($name)));
+
+            return $score > 0 ? ['record' => $record, 'score' => $score] : null;
+        })->filter()->sortByDesc('score')->values();
+
+        if ($matches->isEmpty() || ($matches->count() > 1 && $matches[0]['score'] === $matches[1]['score'])) {
+            return null;
+        }
+
+        return $matches[0]['record'];
     }
 
     protected function choiceIndex(string $choice, int $count): ?int
     {
+        $choice = $this->normalize($choice);
+
         if (! ctype_digit($choice)) {
             return null;
         } $i = (int) $choice - 1;
 
         return $i >= 0 && $i < $count ? $i : null;
+    }
+
+    protected function slotIndex(string $choice, Collection $slots): ?int
+    {
+        $index = $this->choiceIndex($choice, $slots->count());
+        if ($index !== null) {
+            return $index;
+        }
+
+        $choice = $this->normalize($choice);
+        $hour = null;
+        $minute = 0;
+
+        if (preg_match('/\b([01]?\d|2[0-3])(?::|h)([0-5]\d)?\b/', $choice, $matches)) {
+            $hour = (int) $matches[1];
+            $minute = isset($matches[2]) && $matches[2] !== '' ? (int) $matches[2] : 0;
+        } elseif (preg_match('/\b([01]?\d|2[0-3])\s*horas?\b/', $choice, $matches)) {
+            $hour = (int) $matches[1];
+        }
+
+        if ($hour === null) {
+            return null;
+        }
+
+        $wanted = sprintf('%02d:%02d', $hour, $minute);
+        $found = $slots->search(fn (string $slot) => CarbonImmutable::parse($slot)->format('H:i') === $wanted);
+
+        return $found === false ? null : (int) $found;
     }
 
     protected function numbered(Collection $items, callable $label): string
@@ -387,8 +509,138 @@ class BotService
         $session->update(['state' => SessionState::Idle, 'context' => []]);
     }
 
+    protected function awaitAnythingElse(WhatsappSession $session): void
+    {
+        $session->update(['state' => SessionState::AwaitingAnythingElse, 'context' => []]);
+    }
+
     protected function touch(WhatsappSession $session): void
     {
         $session->update(['last_interaction_at' => now()]);
+    }
+
+    protected function actionIntent(string $text): ?string
+    {
+        return match (true) {
+            $text === '1' => 'book',
+            $text === '2' => 'list',
+            $text === '3' => 'cancel',
+            $text === '4' => 'reschedule',
+            Str::contains($text, ['reagendar', 'remarcar', 'mudar a data', 'trocar a data', 'mudar meu horario']) => 'reschedule',
+            $text === 'cancelar' || Str::contains($text, ['cancelar consulta', 'desmarcar consulta', 'desmarcar horario']) => 'cancel',
+            Str::contains($text, ['minhas consultas', 'meus agendamentos', 'ver consulta', 'consultar horario', 'tenho consulta']) => 'list',
+            Str::contains($text, ['agendar', 'agendamento', 'quero marcar', 'marcar consulta', 'marcar horario', 'quero uma consulta']) => 'book',
+            default => null,
+        };
+    }
+
+    protected function normalize(string $text): string
+    {
+        return Str::of($text)
+            ->ascii()
+            ->lower()
+            ->replaceMatches('/[^a-z0-9:\/\s]/', ' ')
+            ->squish()
+            ->value();
+    }
+
+    /** @return array<int, string> */
+    protected function meaningfulTokens(string $text): array
+    {
+        $ignored = ['com', 'das', 'dos', 'uma', 'para', 'por', 'que', 'quero', 'prefiro', 'doutor', 'doutora', 'dra', 'dr'];
+
+        return collect(preg_split('/\s+/', $this->normalize($text)) ?: [])
+            ->filter(fn (string $token) => mb_strlen($token) >= 3 && ! in_array($token, $ignored, true))
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    protected function isGreeting(string $text): bool
+    {
+        return in_array($text, ['oi', 'ola', 'bom dia', 'boa tarde', 'boa noite', 'e ai', 'tudo bem'], true);
+    }
+
+    protected function isAffirmative(string $text): bool
+    {
+        return in_array($text, ['sim', 's', 'isso', 'isso mesmo', 'correto', 'confirmo', 'pode confirmar', 'sim por favor'], true);
+    }
+
+    protected function isNegative(string $text): bool
+    {
+        return in_array($text, ['nao', 'n', 'negativo', 'nao quero', 'pode cancelar', 'cancelar'], true);
+    }
+
+    protected function wantsHuman(string $text): bool
+    {
+        return Str::contains($text, ['atendente', 'recepcao', 'falar com alguem', 'falar com uma pessoa', 'pessoa de verdade']);
+    }
+
+    protected function wantsBot(string $text): bool
+    {
+        return in_array($text, ['menu', 'voltar ao bot', 'voltar pro bot', 'atendimento automatico', 'retomar atendimento'], true);
+    }
+
+    protected function looksUrgent(string $text): bool
+    {
+        return Str::contains($text, [
+            'dor muito forte',
+            'dor forte',
+            'dor intensa',
+            'dor insuportavel',
+            'sangramento intenso',
+            'nao para de sangrar',
+            'rosto inchado',
+            'inchaco no rosto',
+            'dificuldade para respirar',
+            'dificuldade de respirar',
+            'quebrei o dente',
+            'bati o dente',
+            'trauma no dente',
+            'dente caiu',
+        ]);
+    }
+
+    protected function requestHumanHandoff(WhatsappSession $session, string $message): string
+    {
+        $context = $session->context ?? [];
+        $context['handoff_reason'] = 'manual';
+        $context['handoff_requested_at'] = now()->toIso8601String();
+        $context['last_patient_message'] = $message;
+
+        $session->update([
+            'state' => SessionState::HumanHandoff,
+            'context' => $context,
+            'last_interaction_at' => now(),
+        ]);
+
+        return "Claro 😊 Encaminhei sua conversa para a recepção. Você pode deixar sua mensagem por aqui; o bot ficará em silêncio enquanto uma pessoa continua o atendimento.\n\nSe quiser voltar ao atendimento automático, escreva *voltar ao bot*.";
+    }
+
+    protected function requestUrgentHandoff(WhatsappSession $session, string $message): string
+    {
+        $context = $session->context ?? [];
+        $context['handoff_reason'] = 'possible_urgency';
+        $context['handoff_requested_at'] = now()->toIso8601String();
+        $context['last_patient_message'] = $message;
+
+        $session->update([
+            'state' => SessionState::HumanHandoff,
+            'context' => $context,
+            'last_interaction_at' => now(),
+        ]);
+
+        return "Sinto muito que você esteja passando por isso. Sua mensagem pode precisar de avaliação rápida, e eu não consigo avaliar sintomas ou fazer diagnóstico por aqui. Encaminhei a conversa para a recepção.\n\nSe você considerar uma emergência ou não puder aguardar, procure imediatamente um serviço presencial de urgência da sua região. Em caso de risco imediato à vida, ligue *192*.";
+    }
+
+    protected function rememberHandoffMessage(WhatsappSession $session, string $message): void
+    {
+        $context = $session->context ?? [];
+
+        if ($message !== '') {
+            $context['last_patient_message'] = $message;
+        }
+
+        $session->update(['context' => $context, 'last_interaction_at' => now()]);
     }
 }

@@ -16,6 +16,8 @@ Sistema independente de agendamento odontológico com painel administrativo e at
 - Horários semanais configuráveis e bloqueios para folgas/férias.
 - Agenda sem conflito, respeitando a duração de cada procedimento.
 - Agendamento, consulta, confirmação, cancelamento e reagendamento pelo WhatsApp.
+- Conversa acolhedora com seleção por número ou linguagem natural.
+- Encaminhamento para a recepção, com alerta e acompanhamento no painel.
 - Lembretes automáticos em até 24 horas e 2 horas antes.
 - Painel Filament com agenda e indicadores do dia.
 - PostgreSQL, Redis, filas, scheduler e Evolution API em Docker.
