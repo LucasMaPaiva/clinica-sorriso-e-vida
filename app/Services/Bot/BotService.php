@@ -37,6 +37,12 @@ class BotService
             return [$this->requestHumanHandoff($session, $text)];
         }
 
+        // Pedido de atendente expira sozinho: se a recepção não encerrou em
+        // tempo, o bot volta a responder em vez de deixar o paciente no vácuo.
+        if ($session->state === SessionState::HumanHandoff && $this->handoffExpired($session)) {
+            $this->reset($session);
+        }
+
         if ($session->state === SessionState::HumanHandoff) {
             if ($this->wantsBot($normalized)) {
                 $this->reset($session);
@@ -631,6 +637,14 @@ class BotService
         ]);
 
         return "Sinto muito que você esteja passando por isso. Sua mensagem pode precisar de avaliação rápida, e eu não consigo avaliar sintomas ou fazer diagnóstico por aqui. Encaminhei a conversa para a recepção.\n\nSe você considerar uma emergência ou não puder aguardar, procure imediatamente um serviço presencial de urgência da sua região. Em caso de risco imediato à vida, ligue *192*.";
+    }
+
+    protected function handoffExpired(WhatsappSession $session): bool
+    {
+        $requestedAt = data_get($session->context, 'handoff_requested_at');
+        $since = $requestedAt ? CarbonImmutable::parse($requestedAt) : $session->last_interaction_at;
+
+        return $since->diffInMinutes(now()) >= config('clinic.handoff_timeout_minutes');
     }
 
     protected function rememberHandoffMessage(WhatsappSession $session, string $message): void

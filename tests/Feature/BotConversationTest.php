@@ -88,6 +88,23 @@ it('hands the conversation to reception and keeps the bot silent', function () {
         ->and($session->fresh()->state)->toBe(SessionState::AwaitingAction);
 });
 
+it('releases the reception handoff after the timeout and the bot answers again', function () {
+    config()->set('clinic.handoff_timeout_minutes', 120);
+    $bot = app(BotService::class);
+    $phone = '5595984000005';
+
+    $bot->handleIncomingMessage($phone, 'quero falar com um atendente', false);
+
+    CarbonImmutable::setTestNow('2026-09-29 09:59:00');
+    expect($bot->handleIncomingMessage($phone, 'alguém aí?', false))->toBe([]);
+
+    CarbonImmutable::setTestNow('2026-09-29 10:00:00');
+    $resumed = $bot->handleIncomingMessage($phone, 'oi', false);
+
+    expect($resumed)->not->toBe([])
+        ->and(WhatsappSession::query()->where('phone', $phone)->value('state'))->not->toBe(SessionState::HumanHandoff);
+});
+
 it('routes possible dental urgency to reception without diagnosing', function () {
     $phone = '5595984000003';
 
