@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Appointments;
 
 use App\Enums\AppointmentStatus;
+use App\Filament\Resources\Appointments\Pages\CalendarioAgenda;
 use App\Filament\Resources\Appointments\Pages\CreateAppointment;
 use App\Filament\Resources\Appointments\Pages\EditAppointment;
 use App\Filament\Resources\Appointments\Pages\ListAppointments;
@@ -60,6 +61,6 @@ class AppointmentResource extends Resource
 
     public static function getPages(): array
     {
-        return ['index' => ListAppointments::route('/'), 'create' => CreateAppointment::route('/create'), 'edit' => EditAppointment::route('/{record}/edit')];
+        return ['index' => CalendarioAgenda::route('/'), 'lista' => ListAppointments::route('/lista'), 'create' => CreateAppointment::route('/create'), 'edit' => EditAppointment::route('/{record}/edit')];
     }
 }

@@ -1,0 +1,449 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+:root {
+    --default-font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+    font-family: var(--default-font-family);
+}
+
+/* ==========================================================================
+   Tema Clínica Sorriso e Vida — visual moderno (sidebar escura chapada,
+   cards com sombra suave, cores sólidas, tabelas mais limpas).
+   ========================================================================== */
+
+:root {
+    --cs-radius: 1rem;
+    --cs-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 14px rgba(15, 23, 42, 0.05);
+    --cs-shadow-md: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 20px rgba(15, 23, 42, 0.07);
+    --cs-sidebar: #0f2e2c;
+}
+
+/* ---------- Fundo da página ---------- */
+html:not(.dark) .fi-body,
+html:not(.dark) .fi-layout {
+    background: #f6f7f9;
+}
+
+/* ---------- Sidebar escura ---------- */
+.fi-sidebar,
+.fi-sidebar-header {
+    background: var(--cs-sidebar) !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.fi-sidebar-header {
+    background: transparent !important;
+}
+
+.fi-sidebar-header .fi-logo,
+.fi-sidebar-header a {
+    color: #fff !important;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.fi-sidebar-group-label,
+.fi-sidebar-group-btn span {
+    color: rgba(204, 251, 241, 0.55) !important;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.fi-sidebar-item-btn {
+    border-radius: 0.75rem;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.fi-sidebar-item-label,
+.fi-sidebar-item-icon {
+    color: rgba(240, 253, 250, 0.78) !important;
+}
+
+.fi-sidebar-item-btn:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.fi-sidebar-item-btn:hover .fi-sidebar-item-label,
+.fi-sidebar-item-btn:hover .fi-sidebar-item-icon {
+    color: #fff !important;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: #0d9488 !important;
+    box-shadow: none;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: #fff !important;
+    font-weight: 600;
+}
+
+/* ---------- Topbar ---------- */
+.fi-topbar > nav,
+.fi-topbar nav {
+    background: rgba(255, 255, 255, 0.78) !important;
+    backdrop-filter: saturate(180%) blur(14px);
+    box-shadow: 0 1px 0 rgba(15, 23, 42, 0.06) !important;
+}
+
+html.dark .fi-topbar > nav,
+html.dark .fi-topbar nav {
+    background: rgba(9, 24, 24, 0.75) !important;
+}
+
+/* ---------- Cabeçalho das páginas ---------- */
+.fi-header-heading {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* ---------- Cards, seções, tabelas, widgets ---------- */
+.fi-section,
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat,
+.fi-wi-chart,
+.fi-fo-repeater-item,
+.fi-in-repeatable-entry {
+    border-radius: var(--cs-radius) !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    box-shadow: var(--cs-shadow-sm) !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+html.dark .fi-section,
+html.dark .fi-ta-ctn,
+html.dark .fi-wi-stats-overview-stat {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    box-shadow: var(--cs-shadow-md) !important;
+    transform: translateY(-2px);
+}
+
+.fi-wi-stats-overview-stat-value {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.fi-section-header-heading {
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+/* Tabelas */
+.fi-ta-header-cell {
+    background: rgba(241, 245, 249, 0.7);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+html.dark .fi-ta-header-cell {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.fi-ta-row {
+    transition: background 0.12s ease;
+}
+
+.fi-ta-row:hover {
+    background: rgba(20, 184, 166, 0.06) !important;
+}
+
+/* ---------- Botões ---------- */
+.fi-btn {
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.fi-btn.fi-color-primary:not(.fi-outlined):not(.fi-btn-color-gray) {
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+}
+
+.fi-btn.fi-color-primary:not(.fi-outlined):hover {
+    filter: brightness(1.05);
+}
+
+/* ---------- Inputs ---------- */
+.fi-input-wrp {
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: box-shadow 0.15s ease;
+}
+
+.fi-input-wrp:focus-within {
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18) !important;
+}
+
+/* ---------- Badges ---------- */
+.fi-badge {
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+/* ---------- Abas ---------- */
+.fi-tabs-item {
+    border-radius: 0.65rem;
+}
+
+/* ---------- Login / telas simples ---------- */
+.fi-simple-layout {
+    background: #0f2e2c;
+}
+
+.fi-simple-main {
+    border-radius: 1.5rem;
+    border: 0;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.fi-simple-header-heading {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* ---------- Scrollbar discreta ---------- */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(20, 184, 166, 0.4) transparent;
+}
+
+/* ---------- Página Calendário ---------- */
+.cs-cal {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+}
+
+@media (min-width: 1100px) {
+    .cs-cal {
+        grid-template-columns: minmax(0, 1fr) 24rem;
+    }
+}
+
+.cs-cal-card {
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: var(--cs-radius);
+    box-shadow: var(--cs-shadow-sm);
+    padding: 1.25rem;
+}
+
+html.dark .cs-cal-card {
+    background: var(--gray-900);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.cs-cal-head,
+.cs-side-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.cs-cal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cs-cal-title h2,
+.cs-side-head h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: capitalize;
+}
+
+.cs-cal-title h2 {
+    min-width: 11rem;
+    text-align: center;
+}
+
+.cs-cal-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cs-cal-nav {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.65rem;
+    color: var(--gray-600);
+    transition: background 0.15s ease;
+}
+
+.cs-cal-nav:hover {
+    background: rgba(20, 184, 166, 0.1);
+    color: var(--primary-700);
+}
+
+.cs-cal-select {
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 0.65rem;
+    padding: 0.4rem 2rem 0.4rem 0.75rem;
+    font-size: 0.875rem;
+    background-color: transparent;
+}
+
+.cs-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.4rem;
+}
+
+.cs-cal-weekdays {
+    margin-bottom: 0.4rem;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+}
+
+.cs-day {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.25rem;
+    min-height: 5.25rem;
+    padding: 0.55rem 0.6rem;
+    border: 1px solid rgba(15, 23, 42, 0.07);
+    border-radius: 0.85rem;
+    text-align: left;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cs-day:hover {
+    border-color: var(--primary-400);
+    background: rgba(20, 184, 166, 0.05);
+}
+
+.cs-day.is-out {
+    opacity: 0.4;
+}
+
+.cs-day-num {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.cs-day.is-today .cs-day-num {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin: -0.15rem 0 0 -0.2rem;
+    border-radius: 999px;
+    background: var(--primary-600);
+    color: #fff;
+}
+
+.cs-day-count {
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(20, 184, 166, 0.14);
+    color: var(--primary-800);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+html.dark .cs-day-count {
+    color: var(--primary-300);
+}
+
+.cs-day.is-selected {
+    border-color: var(--primary-600);
+    background: rgba(20, 184, 166, 0.09);
+    box-shadow: 0 0 0 2px var(--primary-600);
+}
+
+/* Lista do dia */
+.cs-side-kicker {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+}
+
+.cs-appt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.75rem 0.85rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid rgba(15, 23, 42, 0.07);
+    border-radius: 0.85rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.cs-appt-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    width: 100%;
+    padding-top: 0.6rem;
+    margin-top: 0.15rem;
+    border-top: 1px dashed rgba(15, 23, 42, 0.1);
+}
+
+.cs-appt-time {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--primary-700);
+}
+
+html.dark .cs-appt-time {
+    color: var(--primary-300);
+}
+
+.cs-appt-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.cs-appt-body strong,
+.cs-appt-body span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cs-appt-body span {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+}
+
+.cs-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: 2.5rem 1rem;
+    color: var(--gray-400);
+    text-align: center;
+}

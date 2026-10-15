@@ -2,11 +2,11 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
+use App\Filament\Pages\Dashboard;
+use App\Http\Middleware\AuthenticatePanel;
+use App\Http\Middleware\AuthenticatePanelSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -26,8 +26,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
             ->brandName('Clínica Sorriso e Vida 🦷')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->databaseNotifications()
             ->databaseNotificationsPolling('30s')
             ->colors([
@@ -46,7 +46,7 @@ class AdminPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
-                AuthenticateSession::class,
+                AuthenticatePanelSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,
                 SubstituteBindings::class,
@@ -54,7 +54,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                AuthenticatePanel::class,
             ]);
     }
 }
