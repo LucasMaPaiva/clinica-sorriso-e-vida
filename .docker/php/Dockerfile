@@ -52,18 +52,12 @@ RUN apk add --no-cache shadow \
 USER www-data
 
 # ============================================================
-# Assets: compila CSS/JS (Vite) para a imagem de produção
-# ============================================================
-FROM node:22-alpine AS assets
-
-WORKDIR /app
-COPY package.json package-lock.json vite.config.js ./
-RUN npm ci
-COPY resources ./resources
-RUN npm run build
-
-# ============================================================
 # Prod: código copiado, dependências otimizadas, sem composer/node
+#
+# O tema do Filament (resources/css/filament/...) importa CSS de
+# dentro do vendor/, por isso os assets só podem ser compilados
+# depois do composer install, neste mesmo estágio. Node e
+# node_modules não chegam à imagem final.
 # ============================================================
 FROM base AS prod
 
@@ -73,8 +67,13 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 
 COPY . .
-COPY --from=assets /app/public/build ./public/build
 COPY .docker/php/php-prod.ini /usr/local/etc/php/conf.d/zz-prod.ini
+
+RUN apk add --no-cache nodejs npm \
+    && npm ci \
+    && npm run build \
+    && rm -rf node_modules \
+    && apk del nodejs npm
 
 RUN composer dump-autoload --optimize --no-dev \
     && rm /usr/bin/composer \
